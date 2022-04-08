@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "id": "AI7v3Ke68J3agsRegWBqI",
+      "name": "Paolo2",
+      "password": "Paolo123"
+    },
+    {
+      "id": "BPdPDBF_XWBUD6ledGVzs",
+      "name": "Paolo3",
+      "password": "Paolo123"
+    },
+    {
+      "id": "0-WLSFGQ__dBeK-sMKE2m",
+      "name": "Paolo4",
+      "password": "Paolo123"
+    },
+    {
+      "id": "OkcThvKf5d3aCyZchD8B0",
+      "name": "Paolo5Hashed",
+      "password": "$2b$10$7A9oFo4FBoCSQ7rVDG3aKuRO4oW7u4rfoxCgYU5.A36d.6aydtl8S"
+    },
+    {
+      "id": "pVbqln8nrAJvDk2yjnga5",
+      "name": "Paolo6Hashed",
+      "password": "$2b$10$3L2AUjmB4RBDvqOUW5bLAOCcn/zksPMfCU8P73nj8nBwbBEGl.FGO"
+    },
+    {
+      "id": "jmYRVOcVtAHbfxAK20qUj",
+      "name": "Paolo7Hashed",
+      "password": "$2b$10$CVT7zQ7Xbz.lk3s.uLa2.OTbsQwXPu510TqFtydCQPjbP.IcDpsdC"
+    },
+    {
+      "id": "guWLO1s23k88JJfwSgIds",
+      "name": "Paolo8Hashed",
+      "password": "$2b$10$2wXqxmujs376kIgCqdfZhuAjO/yN3j1wKwxc33LY9GF7aeAZg.Pz."
+    }
+  ]
+}
