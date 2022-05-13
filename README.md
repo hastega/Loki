@@ -18,7 +18,7 @@ Node and Express SK to use as develop support of remote BE.
 
 ## Next Implementations
 
-- Implement caching remote API response
+- Implement caching remote API  (TCIN1-2)
 
 - Unify local JSON db and Cache DB (Redis? JSON file?) and make it easily editable.
 
@@ -27,6 +27,10 @@ Node and Express SK to use as develop support of remote BE.
 - API definition from JSON-OpenAPI
 
 - Custom middleware implementation
+
+## Visual
+
+
 
 ## How to run
 
