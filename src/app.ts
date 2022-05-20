@@ -15,7 +15,7 @@ import authRoutes from "./routes/v1/auth.routes"
 import { checkUser } from './utils/jwtAuth.utils';
 
 import axios from 'axios';
-import redis from 'redis';
+import * as redis from 'redis';
 import config from "config";
 
 
@@ -23,10 +23,19 @@ const proxyTarget = "http://localhost:3000";
 
 const app = express();
 const appProxy = httpProxy.createProxyServer();
-// const redisClient = redis.createClient({
-//     host: config.get<string>("redis.hostname"),
-//     port: config.get<number>("redis.port")
-//   });
+const redisClient = redis.createClient({
+    socket: {
+        // port: config.get<number>("redis.port"),
+        // host: config.get<string>('redis.hostname')
+        port: 6379,
+        host: 'localhost'
+    }
+});
+
+redisClient.on("error", (error) => {
+    console.error(error)
+})
+
 
 // app.all("/proxy/*", function(req, res) {
 //     appProxy.web(req, res, {target: proxyTarget})
@@ -48,17 +57,19 @@ app.use('/', authRoutes);
 // app.use('/cache', cacheRoutes)
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-app.get('/protected', checkUser, (req, res) => {
+app.get('/protected', checkUser, (_req, res) => {
     res.send('protected route');
 })
 
 //cacheing 
 
-app.get('/cmc', async (req,res) => {
+app.get('/cmc', async (req, res) => {
+    await redisClient.connect();
+
     const config = {
         headers: {
             'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': '05790f06-87eb-4619-85fb-f54e1ca557e5'
+            'X-CMC_PRO_API_KEY': process.env.CMCAPIKEY as string
         },
         params: {
             'start': '1',
@@ -67,23 +78,41 @@ app.get('/cmc', async (req,res) => {
     }
 
     try {
-        // client.get('common', async (err, recipe) => {})
+        const requestName = "listings";
 
-        const recipe = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', config);
-        return res.status(200).send({
-            error: false,
-            data: recipe.data
-        })
+        let listings = await redisClient.get(requestName)
+
+        if (listings) {
+            return res.status(200).send({
+                error: false,
+                message: "here/'s the cache data",
+                data: listings
+            })
+            console.log(listings);
+
+        } else {
+            const recipe = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', config);
+
+            redisClient.setEx(requestName, 1440, JSON.stringify(recipe.data))
+
+            return res.status(200).send({
+                error: false,
+                data: recipe.data
+            })
+        }
+
     } catch (error) {
         console.log(error);
+    } finally {
+        redisClient.quit()
     }
 });
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
     res.send('index')
 })
 
-app.use((req, res) => {
+app.use((_req, res) => {
     res.status(404).send('404: Page Not Found!');
 })
 
