@@ -12,6 +12,8 @@ import { options } from "./swaggerOptions";
 
 import usersRoutes from "./routes/v1/users.routes"
 import authRoutes from "./routes/v1/auth.routes"
+import redisRoutes from './routes/v1/redis.routes';
+
 import { checkUser } from './utils/jwtAuth.utils';
 
 import axios from 'axios';
@@ -23,12 +25,11 @@ const proxyTarget = "http://localhost:3000";
 
 const app = express();
 const appProxy = httpProxy.createProxyServer();
+
 const redisClient = redis.createClient({
     socket: {
-        // port: config.get<number>("redis.port"),
-        // host: config.get<string>('redis.hostname')
-        port: 6379,
-        host: 'localhost'
+        port: config.get<number>("redis.port"),
+        host: config.get<string>('redis.hostname')
     }
 });
 
@@ -54,12 +55,12 @@ const specs = swaggerJSDoc(options);
 
 app.use('/', usersRoutes);
 app.use('/', authRoutes);
-// app.use('/cache', cacheRoutes)
+app.use('/redis', redisRoutes)
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.get('/protected', checkUser, (_req, res) => {
     res.send('protected route');
-})
+});
 
 //cacheing 
 
@@ -76,6 +77,7 @@ app.get('/cmc', async (req, res) => {
             'limit': '1000',
         }
     }
+
 
     try {
         const requestName = "listings";
@@ -103,10 +105,13 @@ app.get('/cmc', async (req, res) => {
 
     } catch (error) {
         console.log(error);
+
     } finally {
         redisClient.quit()
     }
 });
+
+
 
 app.get('/', (_req, res) => {
     res.send('index')
