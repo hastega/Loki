@@ -19,6 +19,15 @@ import { checkUser } from './utils/jwtAuth.utils';
 import axios from 'axios';
 import * as redis from 'redis';
 import config from "config";
+import https from "https" 
+
+if (process.env.NODE_ENV === 'development') {
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    })
+    axios.defaults.httpsAgent = httpsAgent;
+    console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`)
+}
 
 
 const proxyTarget = "http://localhost:3000";
