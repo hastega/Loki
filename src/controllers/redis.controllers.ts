@@ -5,7 +5,6 @@ import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import https from "https"
 
 
-
 const redisClient = redis.createClient({
     socket: {
         port: config.get<number>("redis.port"),
@@ -27,50 +26,68 @@ export const logMiddleware: Handler = (req, res) => {
 
 }
 
-export const getRedisCache: Handler = async (req, res) => {
-    // await redisClient.connect()
+export const setHeader = (headers: string[]): Handler => {
+    return (req, res, next) => {
+        req.appVarHeaders = headers;
 
+        next();
+    }
+} 
+
+export const getRedisCache: Handler = async (req, res) => {
+
+    // await redisClient.connect()
+    console.log("myHeaders", req.appVarHeaders)
     
     const params = req.params
     const query = req.query
     const headers = req.headers
     
-    const config: AxiosRequestConfig<any> = {
-        // headers: {
-        //             'Accepts': 'application/json',
-        //             // 'X-CMC_PRO_API_KEY': process.env.CMCAPIKEY as string
-        //             'x-cmc_pro_api_key': '-'
-        //         },
+
+    console.log('headers', headers)
+    console.log('req.appVarHeaders', req.appVarHeaders)
+
+    // const config: AxiosRequestConfig<any> = {
+    //     headers: req.headers as unknown as AxiosRequestHeaders,
+    //     params: query
+    // }
+    
+    const config = {
         headers: {
-            // Accepts: 'application/json',
-            // // 'X-CMC_PRO_API_KEY': '-',
-            // 'user-agent': 'Thunder Client (https://www.thunderclient.com)',
-            // 'x-cmc_pro_api_key': '-',
-            // // 'accept-encoding': 'gzip, deflate, br',
-            // // host: 'localhost:4201',
-            // // connection: 'close'
+            'Accepts': 'application/json',
+            'X-CMC_PRO_API_KEY': process.env.CMCAPIKEY as string
         },
-        params: query
-    }
-    
-    Object.entries(headers).forEach(([key, value]) => {
-        if (config.headers != undefined) {
-            config.headers[key] = (value as string)
+        params: {
+            'start': '1',
+            'limit': '5',
         }
-    });
+    }
+    // Object.entries(headers).forEach(([key, value]) => {
+    //     if (config.headers != undefined) {
+    //         config.headers[key] = (value as string)
+    //     }
+    // });
     
+
     // const config = {
-    //     
+        
     //     params: {
     //         'start': '1',
     //         'limit': '1',
     //     }
     // }
 
+
+
     console.log(config)
 
-    const fetch = await axios.get(`https:/${params[0]}`, config).then(res => console.log(res.data))
-    .catch(err => console.log(err.response.data));
+    console.log(params[0])
+    const fetch = await axios.get(`https:/${params[0]}`, config)
+
+    return res.status(200).send({
+        error: false,
+        data: fetch.data
+    })
 
 
 }

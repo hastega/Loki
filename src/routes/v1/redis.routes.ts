@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getRedisCache, logMiddleware } from "../../controllers/redis.controllers";
+import { getRedisCache, setHeader, logMiddleware } from "../../controllers/redis.controllers";
 
 const router = Router();
 
-router.get("*", getRedisCache);
+router.get("*", setHeader(['Accept', 'X-CMC_PRO_API_KEY']), getRedisCache);
 
 // router.get("/user/:id", getUser);
 
