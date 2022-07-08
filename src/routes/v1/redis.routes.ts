@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getRedisCache, setHeader, logMiddleware } from "../../controllers/redis.controllers";
+import { getRedisCache, setHeader } from "../../controllers/redis.controllers";
 
 const router = Router();
 

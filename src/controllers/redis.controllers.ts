@@ -2,7 +2,6 @@ import { Handler } from "express";
 import * as redis from 'redis';
 import config from "config";
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
-import https from "https"
 
 
 const redisClient = redis.createClient({
@@ -17,77 +16,62 @@ redisClient.on("error", (error) => {
 })
 
 
-export const logMiddleware: Handler = (req, res) => {
-    const params = req.params
-    const query = req.query
-    const headers = req.headers
-    console.log(params, query, headers);
-
-
-}
-
 export const setHeader = (headers: string[]): Handler => {
-    return (req, res, next) => {
+    return (req, _, next) => {
         req.appVarHeaders = headers;
 
         next();
     }
-} 
+}
 
 export const getRedisCache: Handler = async (req, res) => {
+    const params = req.params;
+    const query = req.query;
+    let headers: { [key: string]: string } = {};
 
-    // await redisClient.connect()
-    console.log("myHeaders", req.appVarHeaders)
-    
-    const params = req.params
-    const query = req.query
-    const headers = req.headers
-    
-
-    console.log('headers', headers)
-    console.log('req.appVarHeaders', req.appVarHeaders)
-
-    // const config: AxiosRequestConfig<any> = {
-    //     headers: req.headers as unknown as AxiosRequestHeaders,
-    //     params: query
-    // }
-    
-    const config = {
-        headers: {
-            'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': process.env.CMCAPIKEY as string
-        },
-        params: {
-            'start': '1',
-            'limit': '5',
+    req.appVarHeaders?.forEach((selectedHeader, i) => req.rawHeaders.forEach((requestHeader, j) => {
+        if (selectedHeader.toLowerCase() == requestHeader.toLowerCase()) {
+            headers[(req.appVarHeaders as string[])[i]] = req.rawHeaders[j + 1];
         }
+    }));
+
+    const config: AxiosRequestConfig<any> = {
+        headers: headers,
+        params: query
+    };
+
+    await redisClient.connect();
+
+    try {
+        const requestName = params[0] + JSON.stringify(query);
+
+        let requestedCache = await redisClient.get(requestName)
+
+        if (requestedCache) {
+            return res.status(200).send({
+                error: false,
+                message: "here/'s the cache data",
+                data: JSON.parse(requestedCache)
+            });
+
+        } else {
+
+            const fetch = await axios.get(`https:/${params[0]}`, config)
+
+            redisClient.setEx(requestName, 1440, JSON.stringify(fetch.data))
+
+            return res.status(200).send({
+                error: false,
+                message: "here/'s the fetched data",
+                data: fetch.data
+            })
+        }
+
+    } catch (error) {
+        console.log(error);
+
+    } finally {
+        redisClient.quit();
     }
-    // Object.entries(headers).forEach(([key, value]) => {
-    //     if (config.headers != undefined) {
-    //         config.headers[key] = (value as string)
-    //     }
-    // });
-    
-
-    // const config = {
-        
-    //     params: {
-    //         'start': '1',
-    //         'limit': '1',
-    //     }
-    // }
-
-
-
-    console.log(config)
-
-    console.log(params[0])
-    const fetch = await axios.get(`https:/${params[0]}`, config)
-
-    return res.status(200).send({
-        error: false,
-        data: fetch.data
-    })
-
 
 }
