@@ -1,7 +1,7 @@
 {
-  "name": "jserver-webapp-starter-kit",
+  "name": "node_express_backend_starter_kit",
   "version": "1.0.0",
-  "description": "Fake server to mock api in webapp development",
+  "description": "Node and Express SK to use as develop support of remote BE",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

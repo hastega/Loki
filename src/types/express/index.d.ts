@@ -1,5 +1,6 @@
 declare namespace Express {
     export interface Request {
-       appVarHeaders?: string[]
+       appVarHeaders?: string[],
+       appVarProxyTarget: string
     }
  }

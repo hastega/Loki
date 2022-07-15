@@ -19,7 +19,6 @@ redisClient.on("error", (error) => {
 export const setHeader = (headers: string[]): Handler => {
     return (req, _, next) => {
         req.appVarHeaders = headers;
-
         next();
     }
 }
