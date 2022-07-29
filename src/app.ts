@@ -12,6 +12,7 @@ import usersRoutes from "./routes/v1/users.routes";
 import authRoutes from "./routes/v1/auth.routes";
 import redisRoutes from './routes/v1/redis.routes';
 import proxyRoutes from "./routes/v1/proxy.routes";
+import localCacheRoutes from './routes/v1/localCache.routes';
 
 import { checkUser } from './utils/jwtAuth.utils';
 
@@ -40,8 +41,9 @@ const specs = swaggerJSDoc(options);
 
 app.use('/', usersRoutes);
 app.use('/', authRoutes);
-app.use('/proxy', proxyRoutes)
-app.use('/redis', redisRoutes)
+app.use('/lcache', localCacheRoutes);
+app.use('/proxy', proxyRoutes);
+app.use('/redis', redisRoutes);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.get('/protected', checkUser, (_req, res) => {
