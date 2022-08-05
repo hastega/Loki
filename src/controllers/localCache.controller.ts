@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { Handler } from "express";
+import fs from 'fs'
 
 export const getLocalCache: Handler = async (req, res) => {
     const params = req.params;
@@ -30,15 +31,25 @@ export const getLocalCache: Handler = async (req, res) => {
 
             const baseUrl = splittedPath.shift();
 
-            console.log({baseUrl, splittedPath});
 
-            const fetch = await axios.get(`https:/${params[0]}`, config)
+            const fetch = await axios.get(`https:/${params[0]}`, config);
+            const fileName = Object.entries(query).map((p) => p.join('_')).join('_');
+            const folderPath = splittedPath.join('/');
+            let data; 
+            fs.existsSync(folderPath)
+            await fs.promises.readFile(folderPath+'/'+fileName+'.json').then((res) => {
+                data = JSON.parse(res.toString())
+            })
+            // fs.promises.mkdir(folderPath, { recursive: true }).then(() => 
+            //     fs.writeFileSync(folderPath + '/' + fileName+'.json', JSON.stringify(fetch.data))
+            //     );
 
             return res.status(200).send({
                 error: false,
                 message: "here/'s the fetched data",
-                data: fetch.data
+                data: data
             })
+
             
         }
 
