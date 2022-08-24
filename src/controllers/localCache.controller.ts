@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { Handler } from "express";
-import fs from 'fs'
+import { existsSync, promises, writeFileSync } from 'fs'
+
 
 export const getLocalCache: Handler = async (req, res) => {
     const params = req.params;
@@ -20,43 +21,58 @@ export const getLocalCache: Handler = async (req, res) => {
         params: query
     };
 
+    //try to read if there is some path like the requested fetch
+    //if is present check for file named with 'params'
+    //if any path is present write path file as folders
+    //fetch and write file inside path named as params
+
+    const splittedPath = path.split('/')
+    splittedPath.shift();
+
+    const baseUrl = splittedPath.shift();
+
+    const fileName = Object.entries(query).map((p) => p.join('_')).join('_');
+    const folderPath = splittedPath.join('/');
+
+    let responseData: any;
+    let messageData: string;
+    let cacheData: boolean;
+
     try {
-        if (false) {
-        //if path of request exist in path file 
-        //Read file from system
+        if (existsSync(folderPath) && existsSync(folderPath + '/' + fileName + '.json')) {
+            await promises.readFile(folderPath + '/' + fileName + '.json')
+                .then(res => {
+                    responseData = JSON.parse(res.toString());
+                });
 
+            messageData = "here/'s you cached data";
+            cacheData = true;
         } else {
-            const splittedPath = path.split('/')
-            splittedPath.shift();
-
-            const baseUrl = splittedPath.shift();
-
-
             const fetch = await axios.get(`https:/${params[0]}`, config);
-            const fileName = Object.entries(query).map((p) => p.join('_')).join('_');
-            const folderPath = splittedPath.join('/');
-            let data; 
-            fs.existsSync(folderPath)
-            await fs.promises.readFile(folderPath+'/'+fileName+'.json').then((res) => {
-                data = JSON.parse(res.toString())
-            })
-            // fs.promises.mkdir(folderPath, { recursive: true }).then(() => 
-            //     fs.writeFileSync(folderPath + '/' + fileName+'.json', JSON.stringify(fetch.data))
-            //     );
 
-            return res.status(200).send({
-                error: false,
-                message: "here/'s the fetched data",
-                data: data
-            })
+            promises.mkdir(folderPath, { recursive: true }).then(_ =>
+                writeFileSync(folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
+            );
 
-            
+            responseData = fetch.data;
+            messageData = "here/'s the fetched data"
+            cacheData = false;
+
         }
 
-    } catch (error) {
-        console.log(error);
+        return res.status(200).send({
+            error: false,
+            cache: cacheData,
+            message: messageData,
+            data: responseData
+        })
 
-    } finally {
+    } catch (error) {
+        return res.status(200).send({
+            error: true,
+            message: error
+        })
+
     }
 
 }
