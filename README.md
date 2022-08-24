@@ -5,7 +5,13 @@
 
 <br/>
 
-Node and Express SK to use as develop support of remote BE. 
+Node and Express Starter Kit to use as support for developers. 
+
+This server has multiple features:
+    - it has a boilerplate for authenticated routes
+    - it has costumizabile proxy
+    - it has redis cache integration (currently only for: GET)
+    - it has local database usable as response to an endpoint (currently only for: GET)
 
 <hr/>
 
@@ -18,29 +24,20 @@ Node and Express SK to use as develop support of remote BE.
 
 ## Next Implementations
 
-- Implement caching remote API  (TCIN1-2)
+- Implementing webSocket
 
-- Unify local JSON db and Cache DB (Redis? JSON file?) and make it easily editable.
-
-- Set a JSON congif file to setup common task (endpoint, forcing cache, etc..)
+- Implementing other methods for local database and redis (?)
 
 - API definition from JSON-OpenAPI
 
 - Custom middleware implementation
 
-## Visual
-
-
 
 ## How to run
 
-have Redis installed on machine.
+Have Redis installed on machine.
 
 - Clone the repo and install requirments.
-
-- run the Venv.
-
-- make database migrations.
 
 - > `npm install`
 
@@ -54,3 +51,60 @@ For Prod
 
 - > `npm run start` 
 
+## How to use:
+
+- ### Local Database
+
+The main purpose of this feature is to have a mocked and fast editable database so that we can have ready to use endpoints. 
+
+.
+├── build                   # Compiled files 
+├── config                  # configuration files
+├── src                     # Source files
+├── static                  # Static files
+├── yourlocaldb             # Dynamic and Editable database
+├── db.json                 # Plain json database 
+├── tsconfig.json          
+├── LICENSE
+└── README.md
+
+In order to use the local database without having any backend you have to make the structure of the folder considering that every folder is a callable endpoint and the nesting of these folders compose the endpoint, for example:
+
+we would like to have a list of users that are working on a project, so we have to interrogate an API that will look like this:
+
+> `hastega.it/v1/projects/AAA/users`
+
+to have one response we have to create in our root directory the following folders and the following json files
+
+.
+├── v1           
+│   └──projects           
+│       └── AAA         
+│            └──users
+│                ├──.json 
+│                └──start_1_limit_30.json
+.
+
+and when we will interrogate the followings APIs
+
+> `localhost:4201/lcache/hastega.it/v1/projects/AAA/users`
+
+> `localhost:4201/lcache/hastega.it/v1/projects/AAA/users?start=1&limit=30`
+
+we will recieve the followings responses
+
+```
+  "error": false,
+  "cache": false,
+  "message": "here/'s the fetched data",
+  "data": (.json file)
+```
+
+```
+  "error": false,
+  "cache": false,
+  "message": "here/'s the fetched data",
+  "data": (start_1_limit_30.json file)
+```
+
+Is possible to use specific json files for specific values of the query parameters, in fact the naming convention uses query parameters to read or create the json files
