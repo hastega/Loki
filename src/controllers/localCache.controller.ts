@@ -21,26 +21,23 @@ export const getLocalCache: Handler = async (req, res) => {
         params: query
     };
 
-    //try to read if there is some path like the requested fetch
-    //if is present check for file named with 'params'
-    //if any path is present write path file as folders
-    //fetch and write file inside path named as params
-
+    
     const splittedPath = path.split('/')
     splittedPath.shift();
-
-    const baseUrl = splittedPath.shift();
-
+    
+    const baseUrl = splittedPath.shift() as string;
+    
     const fileName = Object.entries(query).map((p) => p.join('_')).join('_');
     const folderPath = splittedPath.join('/');
-
+    
+    console.log({baseUrl})
     let responseData: any;
     let messageData: string;
     let cacheData: boolean;
 
     try {
-        if (existsSync(folderPath) && existsSync(folderPath + '/' + fileName + '.json')) {
-            await promises.readFile(folderPath + '/' + fileName + '.json')
+        if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
+            await promises.readFile(baseUrl + '/' + folderPath + '/' + fileName + '.json')
                 .then(res => {
                     responseData = JSON.parse(res.toString());
                 });
@@ -50,8 +47,8 @@ export const getLocalCache: Handler = async (req, res) => {
         } else {
             const fetch = await axios.get(`https:/${params[0]}`, config);
 
-            promises.mkdir(folderPath, { recursive: true }).then(_ =>
-                writeFileSync(folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
+            promises.mkdir(baseUrl + '/' + folderPath, { recursive: true }).then(_ =>
+                writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
             );
 
             responseData = fetch.data;
@@ -75,4 +72,17 @@ export const getLocalCache: Handler = async (req, res) => {
 
     }
 
+}
+
+export const postLocalCache: Handler =async (req, res) => {
+
+    let messageData: string;
+    let cacheData: boolean;
+
+    return res.status(200).send({
+        error: false,
+        cache: false,
+        message: 
+    })
+    
 }
