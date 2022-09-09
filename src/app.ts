@@ -17,15 +17,29 @@ import localCacheRoutes from './routes/v1/localCache.routes';
 import { checkUser } from './utils/jwtAuth.utils';
 
 import axios from 'axios';
-import https from "https"
+import https from "https";
+import WebSocket from 'ws';
 
 if (process.env.NODE_ENV === 'development') {
     const httpsAgent = new https.Agent({
         rejectUnauthorized: false,
     })
     axios.defaults.httpsAgent = httpsAgent;
-    console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`)
+    console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`);
 }
+
+const wss = new WebSocket.Server({ port: Number(process.env.WSPORT) || 8080 });
+
+wss.on('connection', ws => {
+    ws.on('message', message => {
+        console.log('Recieved Meessage =>', message);
+    })
+    setInterval(
+        () => ws.send('Hello from server'),
+        5000
+
+    )
+})
 
 const app = express();
 
@@ -37,6 +51,7 @@ app.use(cookieParser())
 app.use(express.json());
 
 const specs = swaggerJSDoc(options);
+
 
 
 app.use('/', usersRoutes);

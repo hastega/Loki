@@ -82,7 +82,7 @@ export const postLocalCache: Handler =async (req, res) => {
     return res.status(200).send({
         error: false,
         cache: false,
-        message: 
+        message: "Just a POST response, nothing happened"
     })
     
 }
