@@ -2,5 +2,10 @@
     "redis": {
         "hostname": "localhost",
         "port": 6379
+    },
+    "websocket": {
+        "responseMessage": "Hello from server, edit me in config/default.json",
+        "setInterval": false,
+        "interval": 5000
     }
 }

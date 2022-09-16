@@ -1,7 +1,7 @@
 import { Handler } from "express";
 import * as redis from 'redis';
 import config from "config";
-import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 
 const redisClient = redis.createClient({
@@ -26,7 +26,7 @@ export const setHeader = (headers: string[]): Handler => {
 export const getRedisCache: Handler = async (req, res) => {
     const params = req.params;
     const query = req.query;
-    let headers: { [key: string]: string } = {};
+    const headers: { [key: string]: string } = {};
 
     req.appVarHeaders?.forEach((selectedHeader, i) => req.rawHeaders.forEach((requestHeader, j) => {
         if (selectedHeader.toLowerCase() == requestHeader.toLowerCase()) {
@@ -34,7 +34,7 @@ export const getRedisCache: Handler = async (req, res) => {
         }
     }));
 
-    const config: AxiosRequestConfig<any> = {
+    const config: AxiosRequestConfig = {
         headers: headers,
         params: query
     };
@@ -44,7 +44,7 @@ export const getRedisCache: Handler = async (req, res) => {
     try {
         const requestName = params[0] + JSON.stringify(query);
 
-        let requestedCache = await redisClient.get(requestName)
+        const requestedCache = await redisClient.get(requestName)
 
         if (requestedCache) {
             return res.status(200).send({

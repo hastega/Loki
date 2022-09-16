@@ -53,6 +53,10 @@ For Prod
 
 ## How to use:
 
+- ### Web Socket
+
+The main purpose of this feature is to create a simple websocket connection, after configuring the WSPORT in the .env file you can can create a ws conntection that will send you a simple response, editabile in `config/default.json`.
+
 - ### Local Database
 
 The main purpose of this feature is to have a mocked and fast editable database so that we can have ready to use endpoints. 
@@ -77,12 +81,14 @@ we would like to have a list of users that are working on a project, so we have 
 to have one response we have to create in our root directory the following folders and the following json files
 
 .
-├── v1           
-│   └──projects           
-│       └── AAA         
-│            └──users
-│                ├──.json 
-│                └──start_1_limit_30.json
+│
+├─hastega.it
+│ └──v1           
+│    └──projects           
+│        └── AAA         
+│             └──users
+│                 ├──.json 
+│                 └──start_1_limit_30.json
 .
 
 and when we will interrogate the followings APIs

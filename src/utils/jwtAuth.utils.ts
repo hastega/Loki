@@ -1,7 +1,7 @@
 import { Handler } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUser, findUserByName } from "../controllers/user.controller";
+import { findUser } from "../controllers/user.controller";
 
 
 export const maxAge = 1 * 24 * 60 * 60;

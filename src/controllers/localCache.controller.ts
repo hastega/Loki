@@ -8,7 +8,7 @@ export const getLocalCache: Handler = async (req, res) => {
     const query = req.query;
     const path = req.path;
 
-    let headers: { [key: string]: string } = {};
+    const headers: { [key: string]: string } = {};
 
     req.appVarHeaders?.forEach((selectedHeader, i) => req.rawHeaders.forEach((requestHeader, j) => {
         if (selectedHeader.toLowerCase() == requestHeader.toLowerCase()) {
@@ -16,7 +16,7 @@ export const getLocalCache: Handler = async (req, res) => {
         }
     }));
 
-    const config: AxiosRequestConfig<any> = {
+    const config: AxiosRequestConfig = {
         headers: headers,
         params: query
     };
@@ -31,7 +31,7 @@ export const getLocalCache: Handler = async (req, res) => {
     const folderPath = splittedPath.join('/');
     
     console.log({baseUrl})
-    let responseData: any;
+    let responseData = null;
     let messageData: string;
     let cacheData: boolean;
 
@@ -68,21 +68,21 @@ export const getLocalCache: Handler = async (req, res) => {
         return res.status(200).send({
             error: true,
             message: error
-        })
+        });
 
     }
 
 }
 
-export const postLocalCache: Handler =async (req, res) => {
+export const postLocalCache: Handler =async (_,res) => {
 
-    let messageData: string;
-    let cacheData: boolean;
+    const messageData = "Just a POST response, nothing happened";
+    const cacheData = false;
 
     return res.status(200).send({
         error: false,
-        cache: false,
-        message: "Just a POST response, nothing happened"
+        cache: cacheData,
+        message: messageData
     })
     
 }
