@@ -74,9 +74,52 @@ export const getLocalCache: Handler = async (req, res) => {
 
 }
 
-export const postLocalCache: Handler =async (_,res) => {
+export const postLocalCache: Handler =async (req,res) => {
 
-    const messageData = "Just a POST response, nothing happened";
+    const messageData = "Just a POST response, data cointains the request body sent, nothing happened";
+    const cacheData = false;
+
+    return res.status(200).send({
+        error: false,
+        cache: cacheData,
+        message: messageData,
+        data: req.body
+    })
+    
+}
+
+export const putLocalCache: Handler =async (req,res) => {
+
+    const messageData = "Just a PUT response, data cointains the request body sent, nothing happened";
+    const cacheData = false;
+
+    return res.status(200).send({
+        error: false,
+        cache: cacheData,
+        message: messageData,
+        data: req.body
+    })
+    
+}
+
+
+export const patchLocalCache: Handler =async (req,res) => {
+
+    const messageData = "Just a PATCH response, data cointains the request body sent, nothing happened";
+    const cacheData = false;
+
+    return res.status(200).send({
+        error: false,
+        cache: cacheData,
+        message: messageData,
+        data: req.body
+    })
+    
+}
+
+export const deleteLocalCache: Handler =async (_,res) => {
+
+    const messageData = "Just a DELETE response, nothing happened";
     const cacheData = false;
 
     return res.status(200).send({

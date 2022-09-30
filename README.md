@@ -1,6 +1,6 @@
 <br/>
 <h1 align="center">
-    BE - Node Proxy Cache Server
+    Mock Server
 </h1>
 
 <br/>
@@ -24,9 +24,7 @@ This server has multiple features:
 
 ## Next Implementations
 
-- Implementing webSocket
-
-- Implementing other methods for local database and redis (?)
+- Define and implemen response for other methods in cache server
 
 - API definition from JSON-OpenAPI
 
@@ -34,6 +32,8 @@ This server has multiple features:
 
 
 ## How to run
+
+create .env file following the example
 
 Have Redis installed on machine.
 
@@ -53,13 +53,16 @@ For Prod
 
 ## How to use:
 
+
 - ### Web Socket
 
-The main purpose of this feature is to create a simple websocket connection, after configuring the WSPORT in the .env file you can can create a ws conntection that will send you a simple response, editabile in `config/default.json`.
+The main purpose of this feature is to create a simple websocket connection, after configuring the WSPORT in the .env file you can can create a ws conntection that will send you a simple response. the response and the interval of response are editabile in `config/default.json`.
 
 - ### Local Database
 
 The main purpose of this feature is to have a mocked and fast editable database so that we can have ready to use endpoints. 
+
+<pre>
 
 .
 ├── build                   # Compiled files 
@@ -72,6 +75,8 @@ The main purpose of this feature is to have a mocked and fast editable database 
 ├── LICENSE
 └── README.md
 
+</pre>
+
 In order to use the local database without having any backend you have to make the structure of the folder considering that every folder is a callable endpoint and the nesting of these folders compose the endpoint, for example:
 
 we would like to have a list of users that are working on a project, so we have to interrogate an API that will look like this:
@@ -80,6 +85,7 @@ we would like to have a list of users that are working on a project, so we have 
 
 to have one response we have to create in our root directory the following folders and the following json files
 
+<pre>
 .
 │
 ├─hastega.it
@@ -90,6 +96,8 @@ to have one response we have to create in our root directory the following folde
 │                 ├──.json 
 │                 └──start_1_limit_30.json
 .
+
+</pre>
 
 and when we will interrogate the followings APIs
 
