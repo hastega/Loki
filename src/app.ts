@@ -22,24 +22,24 @@ import WebSocket from 'ws';
 import config from 'config';
 
 if (process.env.NODE_ENV === 'development') {
-	const httpsAgent = new https.Agent({
-		rejectUnauthorized: false,
-	});
+    const httpsAgent = new https.Agent({
+        rejectUnauthorized: false,
+    });
 
-	axios.defaults.httpsAgent = httpsAgent;
-	console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`);
+    axios.defaults.httpsAgent = httpsAgent;
+    console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`);
 }
 
 const wss = new WebSocket.Server({ port: Number(process.env.WEB_SOCKET_PORT) || 8080 });
 
 wss.on('connection', (ws) => {
-	ws.on('message', (message) => {
-		console.log('Recieved Meessage =>', message);
-	});
+    ws.on('message', (message) => {
+        console.log('Recieved Meessage =>', message);
+    });
 
-	if (!config.get<boolean>('websocket.setInterval')) return ws.send(config.get<string>('websocket.responseMessage'));
+    if (!config.get<boolean>('websocket.setInterval')) return ws.send(config.get<string>('websocket.responseMessage'));
 
-	setInterval(() => ws.send(config.get<string>('websocket.responseMessage')), 5000);
+    setInterval(() => ws.send(config.get<string>('websocket.responseMessage')), 5000);
 });
 
 const app = express();
@@ -61,15 +61,15 @@ app.use('/redis', redisRoutes);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.get('/protected', checkUser, (_req, res) => {
-	res.send('protected route');
+    res.send('protected route');
 });
 
 app.get('/', (_req, res) => {
-	res.send('index');
+    res.send('index');
 });
 
 app.use((_req, res) => {
-	res.status(404).send('404: Page Not Found!');
+    res.status(404).send('404: Page Not Found!');
 });
 
 export default app;
