@@ -3,12 +3,12 @@
 
 
 <!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][contributors-url]
+<!-- [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+[![LinkedIn][linkedin-shield]][linkedin-url] -->
 
 
 
@@ -68,7 +68,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-As a software house, during times, working on varius frontends we often get our work stuck by the delay in receaving working backends. So we've built this server: LOKI is infact a temporary sobstitute of backend logic that permit to not stop the development of frontend. 
+As a software house, during times, working on various frontends we often get our work stuck by the delay in receiving working backends. So we've built this server: LOKI is infact a temporary sobstitute of backend logic that permit to not stop the development of frontend. 
 
 We've built it with various utilities that we've used, and still use on a daily base, to serve frontends with the logic needed.
 
@@ -88,12 +88,12 @@ We've built it with various utilities that we've used, and still use on a daily 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-create .env file following the example
 
 
 - Clone the repo and install requirments.
 
 - > `npm install`
+- > create `.env` file following the `example.env` file
 
 For Dev environment 
 
@@ -101,23 +101,6 @@ For Dev environment
   
 Remember that you need to have Redis installed on your machine if you want to use the Redis feature.
 
-### Installation
-
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/your_username_/Project-Name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -129,12 +112,12 @@ _Below is an example of how you can instruct your audience on installing and set
 ---
 - ## WEB SOCKET
 
-The main purpose of this feature is to create a simple websocket connection, after configuring 
+The main purpose of this feature is to create a simple Web Socket connection, after configuring 
 ```js
   WEB_SOCKET_PORT = 'YOUR-WEB-SOCKET-PORT';
 ```
    
-in the `.env` file you can can create a Web Socket conntection that will send you a simple response. The response and the interval of response are editabile in `config/default.json`.
+in the `.env` file you can create a Web Socket conntection that will send you a simple response. The response and the interval of response are editabile in `config/default.json`.
 
 ```json
 "websocket": {
@@ -146,7 +129,7 @@ in the `.env` file you can can create a Web Socket conntection that will send yo
 ---
 - ## LOCAL DATABASE
 
-The main purpose of this feature is to have a mocked and fast editable database so that we can have ready to use endpoints.
+The main purpose of this feature is to have a mocked and fast editable database so we can fastly create and have ready to use endpoints.
 
 <pre>
 .
@@ -154,7 +137,7 @@ The main purpose of this feature is to have a mocked and fast editable database 
 ├── config                  # configuration files
 ├── src                     # Source files
 ├── static                  # Static files
-├── dbDirectory             # Dynamic and Editable database for Local Database Feature
+├── dbDirectory             # Dynamic and Editable database for Local Database Feature <-
 ├── db.json                 # Plain json database for JSONServer Feature 
 ├── tsconfig.json          
 ├── LICENSE
@@ -165,7 +148,7 @@ Let's consider two different use cases:
 
 - No backend's endpoints to interrogate
 
-The Local Database feature is useful when there isn't any backend endpoint to interrogate. Infact you could make the structure of the dbDirectory folder considering that every folder is a callable endpoint and the nesting of these folders compose the endpoint path, and the name of the dbDirectory is the domain of the endpoint.
+The Local Database feature is useful when there aren't any backend's endpoints to interrogate. Infact you could make the structure of the dbDirectory folder considering that every folder is a callable endpoint and the nesting of these folders compose the endpoint path, and the name of the dbDirectory is the domain of the endpoint.
 
 Let's assume we would like to have a list of users that are working on a project, and assume that the endpoint will look like this one:
 
@@ -205,7 +188,7 @@ will give us the following response:
   "data": (.json file)
 ```
 
-This feature support also the query params but a most comprehensive example of their usage will be provide in the next use case.
+This feature support also the query params but a more comprehensive example of their usage will be provide in the next use case.
 
 - Backend's endpoints to interrogate
 
@@ -233,10 +216,18 @@ Loki is able to interrogate also custom headers needed endpoints. To correctly p
 It accepts an array of string and has the role to parse correctly the headers inside the axios config request. 
 
 ```js
-router.get("*", setHeader(['CUSTOM_AUTH_HEADER', 'ANOTHER_NEEDED_HEADER']), getLocalCache);
+router.get("*", setHeader(["CUSTOM_AUTH_HEADER", "ANOTHER_NEEDED_HEADER"]), getLocalCache);
 ```
+To semplify the usage you could use also the `config/default.json`
 
-<em>writing docs for https requests...</em>
+```json
+"localDatabase": {
+        "customHeaders": ["CUSTOM_AUTH_HEADER", "ANOTHER_NEEDED_HEADER"],
+        "rejectUnauthorized": false,
+    }
+```
+As you can see there is also another config key `rejectUnauthorized` that can be set to `true` to use axios with https request if is needed
+
 
 - ## JSON SERVER
 
@@ -256,6 +247,8 @@ router.get("*", setHeader(['CUSTOM_AUTH_HEADER', 'ANOTHER_NEEDED_HEADER']), getL
 
 - [x] Made a V1.0.0
 - [ ] Continue writing docs
+- [ ] Create classes to change response type
+- [ ] Enanche handling of errors
 - [ ] Add additional feature for PUT, POST, PATCH, DELETE methods 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

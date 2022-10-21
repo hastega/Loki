@@ -1,18 +1,25 @@
-import { Router } from "express";
-import { deleteLocalCache, getLocalCache, patchLocalCache, postLocalCache, putLocalCache } from "../../controllers/localCache.controller";
-import { setHeader } from "../../controllers/redis.controllers";
+import { Router } from 'express';
+import {
+	deleteLocalCache,
+	getLocalCache,
+	patchLocalCache,
+	postLocalCache,
+	putLocalCache,
+} from '../../controllers/localCache.controller';
+import { setHeader } from '../../controllers/redis.controllers';
+import config from 'config';
 
 const router = Router();
 
-router.get("*", setHeader([]), getLocalCache);
 
-router.post("*", postLocalCache);
+router.get('*', setHeader([...config.get<string[]>("localDatabase.customHeaders")]), getLocalCache);
 
-router.put("*", putLocalCache);
+router.post('*', postLocalCache);
 
-router.patch("*", patchLocalCache);
+router.put('*', putLocalCache);
 
-router.delete("*", deleteLocalCache);
+router.patch('*', patchLocalCache);
 
+router.delete('*', deleteLocalCache);
 
 export default router;
