@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'development') {
     console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`);
 }
 
-const wss = new WebSocket.Server({ port: Number(process.env.WSPORT) || 8080 });
+const wss = new WebSocket.Server({ port: Number(process.env.WEB_SOCKET_PORT) || 8080 });
 
 wss.on('connection', ws => {
     ws.on('message', message => {
@@ -47,7 +47,7 @@ wss.on('connection', ws => {
 
 const app = express();
 
-app.set("port", process.env.JPORT || 3000);
+app.set("port", process.env.LOCAL_DATABASE_PORT || 3000);
 
 app.use(cors());
 app.use(morgan("dev"));

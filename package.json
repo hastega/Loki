@@ -1,7 +1,7 @@
 {
-  "name": "node_express_backend_starter_kit",
-  "version": "0.1.2",
-  "description": "Node and Express SK to use as develop support of remote BE",
+  "name": "loki",
+  "version": "1.0.0",
+  "description": "An utility Node server to support frontends development",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
