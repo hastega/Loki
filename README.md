@@ -308,7 +308,7 @@ Paolo Micheletti - [MAINTAINER](https://www.linkedin.com/in/pablo1255/) - p.mich
 [issues-shield]: https://img.shields.io/github/issues/hastega/Loki?style=for-the-badge
 [issues-url]: https://github.com/hastega/Loki/issues
 [license-shield]: https://img.shields.io/github/license/hastega/Loki?style=for-the-badge
-[license-url]: https://github.com/hastega/Loki/blob/master/LICENSE.txt
+[license-url]: https://github.com/hastega/Loki/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/company/hastega/
 [product-screenshot]: images/screenshot.png
