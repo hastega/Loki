@@ -13,6 +13,8 @@ const router = Router();
 
 router.get('*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
 
+router.get('nocache/*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
+
 router.post('*', postLocalCache);
 
 router.put('*', putLocalCache);

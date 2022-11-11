@@ -5,9 +5,16 @@ import { existsSync, promises, writeFileSync } from 'fs';
 import config from 'config';
 
 export const getLocalCache: Handler = async (req, res) => {
-    const params = req.params;
+    let params = req.params;
     const query = req.query;
-    const path = req.path;
+    let path = req.path;
+    let noCache = false;
+    if (path.includes("nocache")) {
+        noCache = true;
+        path = path.substring(8);
+        params[0] = params[0].substring(8);
+    }
+    console.log(params[0], path)
 
     const headers: { [key: string]: string } = {};
 
@@ -60,9 +67,11 @@ export const getLocalCache: Handler = async (req, res) => {
 
             promises
                 .mkdir(baseUrl + '/' + folderPath, { recursive: true })
-                .then((_) =>
-                    writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
-                );
+                .then((_) => {
+                    if (!noCache) {
+                        writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
+                    }
+                });
 
             responseData = fetch.data;
             messageData = "here/'s the fetched data";
