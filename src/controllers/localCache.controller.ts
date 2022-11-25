@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import https from 'https';
 import { Handler } from 'express';
-import { existsSync, promises, writeFileSync } from 'fs';
+import { existsSync, promises, writeFileSync, unlinkSync, rmdirSync, readdirSync } from 'fs';
 import config from 'config';
 
 export const getLocalCache: Handler = async (req, res) => {
@@ -14,7 +14,7 @@ export const getLocalCache: Handler = async (req, res) => {
         path = path.substring(8);
         params[0] = params[0].substring(8);
     }
-    console.log(params[0], path)
+    console.log(params[0], path, query)
 
     const headers: { [key: string]: string } = {};
 
@@ -130,6 +130,46 @@ export const patchLocalCache: Handler = async (req, res) => {
 
 export const deleteLocalCache: Handler = async (_, res) => {
     const messageData = 'Just a DELETE response, nothing happened';
+    const cacheData = false;
+
+    return res.status(200).send({
+        error: false,
+        cache: cacheData,
+        message: messageData,
+    });
+};
+
+export const deleteCachedData: Handler = async (req, res) => {
+    const query = req.query;
+    const path = req.path;
+
+    const splittedPath = path.split('/');
+    splittedPath.shift();
+    splittedPath.shift();
+
+    const baseUrl = splittedPath.shift() as string;
+
+    const fileName = Object.entries(query)
+        .map((p) => p.join('_'))
+        .join('_');
+    const folderPath = splittedPath.join('/');
+
+    let messageData = 'Cache cleared';
+
+    if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
+        unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
+        messageData = 'File removed';
+    } else if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath)) {
+        if (!readdirSync(baseUrl + '/' + folderPath).length) {
+            rmdirSync(baseUrl + '/' + folderPath);
+            messageData = 'Path removed';
+        } else {
+            messageData = 'File not found, path not empty';
+        }
+    } else {
+        messageData = 'Nothing to clear';
+    }
+
     const cacheData = false;
 
     return res.status(200).send({

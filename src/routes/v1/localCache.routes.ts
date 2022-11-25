@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+    deleteCachedData,
     deleteLocalCache,
     getLocalCache,
     patchLocalCache,
@@ -11,9 +12,9 @@ import config from 'config';
 
 const router = Router();
 
-router.get('*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
+router.get('/clearcache/*', deleteCachedData);
 
-router.get('nocache/*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
+router.get('*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
 
 router.post('*', postLocalCache);
 
