@@ -139,6 +139,46 @@ export const deleteLocalCache: Handler = async (_, res) => {
     });
 };
 
+const recursiveForceRemove = (path: string) => {
+    const content = readdirSync(path, { withFileTypes: true });
+    content.forEach((f) => {
+        if (f.isDirectory()) {
+            recursiveForceRemove(`${path}/${f.name}`);
+        } else {
+            unlinkSync(`${path}/${f.name}`)
+        }
+    });
+    rmdirSync(path);
+}
+
+export const forceDeleteCachedData: Handler = async (req, res) => {
+    const query = req.query;
+    const path = req.path;
+
+    const splittedPath = path.split('/');
+    splittedPath.shift();
+    splittedPath.shift();
+
+    const baseUrl = splittedPath.shift() as string;
+
+    const fileName = Object.entries(query)
+        .map((p) => p.join('_'))
+        .join('_');
+    const folderPath = splittedPath.join('/');
+
+    let messageData = 'Cache read';
+
+    recursiveForceRemove(folderPath);
+
+    const cacheData = false;
+
+    return res.status(200).send({
+        error: false,
+        cache: cacheData,
+        message: messageData,
+    });
+}
+
 export const deleteCachedData: Handler = async (req, res) => {
     const query = req.query;
     const path = req.path;

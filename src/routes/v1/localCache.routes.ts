@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
     deleteCachedData,
     deleteLocalCache,
+    forceDeleteCachedData,
     getLocalCache,
     patchLocalCache,
     postLocalCache,
@@ -11,6 +12,8 @@ import { setHeader } from '../../controllers/redis.controllers';
 import config from 'config';
 
 const router = Router();
+
+router.get('/clearcache/force/*', forceDeleteCachedData);
 
 router.get('/clearcache/*', deleteCachedData);
 
