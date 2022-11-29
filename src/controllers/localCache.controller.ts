@@ -139,44 +139,20 @@ export const deleteLocalCache: Handler = async (_, res) => {
     });
 };
 
-const recursiveForceRemove = (path: string) => {
-    const content = readdirSync(path, { withFileTypes: true });
-    content.forEach((f) => {
-        if (f.isDirectory()) {
-            recursiveForceRemove(`${path}/${f.name}`);
-        } else {
-            unlinkSync(`${path}/${f.name}`)
-        }
-    });
-    rmdirSync(path);
-}
-
-export const forceDeleteCachedData: Handler = async (req, res) => {
-    const query = req.query;
-    const path = req.path;
-
-    const splittedPath = path.split('/');
-    splittedPath.shift();
-    splittedPath.shift();
-
-    const baseUrl = splittedPath.shift() as string;
-
-    const fileName = Object.entries(query)
-        .map((p) => p.join('_'))
-        .join('_');
-    const folderPath = splittedPath.join('/');
-
-    let messageData = 'Cache read';
-
-    recursiveForceRemove(folderPath);
-
-    const cacheData = false;
-
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-    });
+const recursiveForceRemove = (path: string, fileName?: string) => {
+    if (fileName) {
+        unlinkSync(path + '/' + fileName)
+    } else {
+        const content = readdirSync(path, { withFileTypes: true });
+        content.forEach((f) => {
+            if (f.isDirectory()) {
+                recursiveForceRemove(`${path}/${f.name}`);
+            } else {
+                recursiveForceRemove(path, f.name);
+            }
+        });
+        rmdirSync(path);
+    }
 }
 
 export const deleteCachedData: Handler = async (req, res) => {
@@ -186,6 +162,7 @@ export const deleteCachedData: Handler = async (req, res) => {
     const splittedPath = path.split('/');
     splittedPath.shift();
     splittedPath.shift();
+    const type = splittedPath.shift();
 
     const baseUrl = splittedPath.shift() as string;
 
@@ -196,18 +173,22 @@ export const deleteCachedData: Handler = async (req, res) => {
 
     let messageData = 'Cache cleared';
 
-    if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
-        unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
-        messageData = 'File removed';
-    } else if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath)) {
-        if (!readdirSync(baseUrl + '/' + folderPath).length) {
-            rmdirSync(baseUrl + '/' + folderPath);
-            messageData = 'Path removed';
+    if (type === 'folder') {
+        if (existsSync(baseUrl) && existsSync(`${baseUrl}/${folderPath}`)) {
+            recursiveForceRemove(`${baseUrl}/${folderPath}`);
+            messageData = `Force deleted ${folderPath}`;
         } else {
-            messageData = 'File not found, path not empty';
+            messageData = `${folderPath} not found`;
         }
     } else {
-        messageData = 'Nothing to clear';
+        if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
+            unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
+            messageData = 'File removed';
+        } else if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath)) {
+            messageData = 'File not found';
+        } else {
+            messageData = 'Nothing to clear';
+        }
     }
 
     const cacheData = false;

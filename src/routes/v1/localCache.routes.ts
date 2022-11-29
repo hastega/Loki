@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import {
-    deleteCachedData,
     deleteLocalCache,
-    forceDeleteCachedData,
+    deleteCachedData,
     getLocalCache,
     patchLocalCache,
     postLocalCache,
@@ -13,9 +12,9 @@ import config from 'config';
 
 const router = Router();
 
-router.get('/clearcache/force/*', forceDeleteCachedData);
+router.get('/clearcache/folder/*', deleteCachedData);
 
-router.get('/clearcache/*', deleteCachedData);
+router.get('/clearcache/content*', deleteCachedData);
 
 router.get('*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
 
