@@ -12,5 +12,5 @@ export const options = {
             },
         ],
     },
-    apis: ['./src/routes/v1/*.ts'],
+    apis: ['./routes/v1/localCache.routes.ts'],
 };

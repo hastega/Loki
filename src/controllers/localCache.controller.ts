@@ -1,8 +1,10 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import https from 'https';
 import { Handler } from 'express';
-import { existsSync, promises, writeFileSync, unlinkSync, rmdirSync, readdirSync } from 'fs';
+import { existsSync, promises, writeFileSync, unlinkSync } from 'fs';
 import config from 'config';
+import { manageHeader, manageQueryParams, splitPath, recursiveRemove } from '../utils/request.utils';
+import { ClearType } from '../properties/localCache.property';
 
 export const getLocalCache: Handler = async (req, res) => {
     let params = req.params;
@@ -16,15 +18,7 @@ export const getLocalCache: Handler = async (req, res) => {
     }
     console.log(params[0], path, query)
 
-    const headers: { [key: string]: string } = {};
-
-    req.appVarHeaders?.forEach((selectedHeader, i) =>
-        req.rawHeaders.forEach((requestHeader, j) => {
-            if (selectedHeader.toLowerCase() == requestHeader.toLowerCase()) {
-                headers[(req.appVarHeaders as string[])[i]] = req.rawHeaders[j + 1];
-            }
-        })
-    );
+    const headers: { [key: string]: string } = manageHeader(req);
 
     const requestConfig: AxiosRequestConfig = {
         headers: headers,
@@ -39,15 +33,11 @@ export const getLocalCache: Handler = async (req, res) => {
 
     config.get<boolean>('localDatabase.rejectUnauthorized') ? Object.assign(requestConfig, httpsAgent) : null;
 
-    const splittedPath = path.split('/');
-    splittedPath.shift();
+    const splittedPath = splitPath(path, 1);
+    const baseUrl = splittedPath.shifted[0];
 
-    const baseUrl = splittedPath.shift() as string;
-
-    const fileName = Object.entries(query)
-        .map((p) => p.join('_'))
-        .join('_');
-    const folderPath = splittedPath.join('/');
+    const fileName = manageQueryParams(query);
+    const folderPath = splittedPath.folderPath;
 
     console.log({ baseUrl });
     let responseData = null;
@@ -84,10 +74,11 @@ export const getLocalCache: Handler = async (req, res) => {
             message: messageData,
             data: responseData,
         });
-    } catch (error) {
-        return res.status(200).send({
+    } catch (error: any) {
+        const code = error instanceof AxiosError ? error.response?.status || 500 : 500;
+        return res.status(code).send({
             error: true,
-            message: error,
+            message: error.message,
         });
     }
 };
@@ -139,56 +130,41 @@ export const deleteLocalCache: Handler = async (_, res) => {
     });
 };
 
-const recursiveForceRemove = (path: string, fileName?: string) => {
-    if (fileName) {
-        unlinkSync(path + '/' + fileName)
-    } else {
-        const content = readdirSync(path, { withFileTypes: true });
-        content.forEach((f) => {
-            if (f.isDirectory()) {
-                recursiveForceRemove(`${path}/${f.name}`);
-            } else {
-                recursiveForceRemove(path, f.name);
-            }
-        });
-        rmdirSync(path);
-    }
-}
+
 
 export const deleteCachedData: Handler = async (req, res) => {
     const query = req.query;
     const path = req.path;
 
-    const splittedPath = path.split('/');
-    splittedPath.shift();
-    splittedPath.shift();
-    const type = splittedPath.shift();
+    const splittedPath = splitPath(path, 3);
 
-    const baseUrl = splittedPath.shift() as string;
+    const type = splittedPath.shifted[1];
+    const baseUrl = splittedPath.shifted[2];
 
-    const fileName = Object.entries(query)
-        .map((p) => p.join('_'))
-        .join('_');
-    const folderPath = splittedPath.join('/');
+    const fileName = manageQueryParams(query);
+    const folderPath = splittedPath.folderPath;
 
     let messageData = 'Cache cleared';
 
-    if (type === 'folder') {
-        if (existsSync(baseUrl) && existsSync(`${baseUrl}/${folderPath}`)) {
-            recursiveForceRemove(`${baseUrl}/${folderPath}`);
-            messageData = `Force deleted ${folderPath}`;
-        } else {
-            messageData = `${folderPath} not found`;
-        }
-    } else {
-        if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
-            unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
-            messageData = 'File removed';
-        } else if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath)) {
-            messageData = 'File not found';
-        } else {
-            messageData = 'Nothing to clear';
-        }
+    switch(type) {
+        case ClearType.FOLDER:
+            if (existsSync(baseUrl) && existsSync(`${baseUrl}/${folderPath}`)) {
+                recursiveRemove(`${baseUrl}/${folderPath}`);
+                messageData = `Force deleted ${folderPath}`;
+            } else {
+                messageData = `${folderPath} not found`;
+            }
+        break;
+        case ClearType.CONTENT:
+            if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
+                unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
+                messageData = 'File removed';
+            } else if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath)) {
+                messageData = 'File not found';
+            } else {
+                messageData = 'Nothing to clear';
+            }
+        break;
     }
 
     const cacheData = false;
