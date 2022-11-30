@@ -1,6 +1,9 @@
 import { Request } from 'express';
 import QueryString from 'qs';
 import { unlinkSync, rmdirSync, readdirSync } from 'fs';
+import { AxiosRequestConfig } from 'axios';
+import https from 'https';
+import config from 'config';
 
 export const splitPath = (path: string, shift: number): { folderPath: string; shifted: string[] } => {
     const shifted: string[] = [];
@@ -48,4 +51,21 @@ export const recursiveRemove = (path: string, fileName?: string) => {
         });
         rmdirSync(path);
     }
+};
+
+export const getRequestConfig = (headers: { [key: string]: string }, queryParam: QueryString.ParsedQs) => {
+    const requestConfig: AxiosRequestConfig = {
+        headers: headers,
+        params: queryParam,
+    };
+
+    const httpsAgent = {
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false,
+        }),
+    };
+
+    if (config.get<boolean>('localDatabase.rejectUnauthorized')) Object.assign(requestConfig, httpsAgent);
+
+    return requestConfig;
 };
