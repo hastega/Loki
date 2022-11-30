@@ -1,37 +1,24 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import https from 'https';
+import axios, { AxiosError } from 'axios';
 import { Handler } from 'express';
 import { existsSync, promises, writeFileSync, unlinkSync } from 'fs';
-import config from 'config';
-import { manageHeader, manageQueryParams, splitPath, recursiveRemove } from '../utils/request.utils';
+import { manageHeader, manageQueryParams, splitPath, recursiveRemove, getRequestConfig } from '../utils/request.utils';
 import { ClearType } from '../properties/localCache.property';
 
 export const getLocalCache: Handler = async (req, res) => {
-    let params = req.params;
+    const params = req.params;
     const query = req.query;
     let path = req.path;
     let noCache = false;
-    if (path.includes("nocache")) {
+    if (path.includes('nocache')) {
         noCache = true;
         path = path.substring(8);
         params[0] = params[0].substring(8);
     }
-    console.log(params[0], path, query)
+    console.log(params[0], path, query);
 
     const headers: { [key: string]: string } = manageHeader(req);
 
-    const requestConfig: AxiosRequestConfig = {
-        headers: headers,
-        params: query,
-    };
-
-    const httpsAgent = {
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false,
-        }),
-    };
-
-    config.get<boolean>('localDatabase.rejectUnauthorized') ? Object.assign(requestConfig, httpsAgent) : null;
+    const requestConfig = getRequestConfig(headers, query);
 
     const splittedPath = splitPath(path, 1);
     const baseUrl = splittedPath.shifted[0];
@@ -50,21 +37,19 @@ export const getLocalCache: Handler = async (req, res) => {
                 responseData = JSON.parse(res.toString());
             });
 
-            messageData = "here/'s you cached data";
+            messageData = "here's you cached data";
             cacheData = true;
         } else {
             const fetch = await axios.get(`https:/${params[0]}`, requestConfig);
 
-            promises
-                .mkdir(baseUrl + '/' + folderPath, { recursive: true })
-                .then((_) => {
-                    if (!noCache) {
-                        writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
-                    }
-                });
+            promises.mkdir(baseUrl + '/' + folderPath, { recursive: true }).then((_) => {
+                if (!noCache) {
+                    writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data));
+                }
+            });
 
             responseData = fetch.data;
-            messageData = "here/'s the fetched data";
+            messageData = "here's the fetched data";
             cacheData = false;
         }
 
@@ -84,16 +69,84 @@ export const getLocalCache: Handler = async (req, res) => {
 };
 
 export const postLocalCache: Handler = async (req, res) => {
-    const messageData = 'Just a POST response, data cointains the request body sent, nothing happened';
-    const cacheData = false;
+    const params = req.params;
+    const query = req.query;
+    let path = req.path;
+    let noCache = false;
+    if (path.includes('nocache')) {
+        noCache = true;
+        path = path.substring(8);
+        params[0] = params[0].substring(8);
+    }
+    console.log(params[0], path, query);
 
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-        data: req.body,
-    });
+    const headers: { [key: string]: string } = manageHeader(req);
+
+    const requestConfig = getRequestConfig(headers, query);
+
+    const splittedPath = splitPath(path, 1);
+    const baseUrl = splittedPath.shifted[0];
+
+    const fileName = manageQueryParams(query);
+    const folderPath = splittedPath.folderPath;
+
+    console.log({ baseUrl });
+    let responseData = null;
+    let messageData: string;
+    let cacheData: boolean;
+
+    try {
+        if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/post.' + fileName + '.json')) {
+            await promises.readFile(baseUrl + '/' + folderPath + '/' + fileName + '.json').then((res) => {
+                responseData = JSON.parse(res.toString());
+            });
+
+            messageData = "here's you cached data";
+            cacheData = true;
+        } else {
+            const fetch = await axios.post(`https:/${params[0]}`, req.body, requestConfig);
+            // TODO how to store multiple <req.body, fetch.data> map inside single post.XX.json file
+            // promises.mkdir(baseUrl + '/' + folderPath, { recursive: true }).then((_) => {
+            //     if (!noCache) {
+            //         writeFileSync(
+            //             baseUrl + '/' + folderPath + '/post.' + fileName + '.json',
+            //             JSON.stringify(fetch.data)
+            //         );
+            //     }
+            // });
+
+            responseData = fetch.data;
+            messageData = "here's the fetched data";
+            cacheData = false;
+        }
+
+        return res.status(200).send({
+            error: false,
+            cache: cacheData,
+            message: messageData,
+            data: responseData,
+        });
+    } catch (error: any) {
+        const code = error instanceof AxiosError ? error.response?.status || 500 : 500;
+        return res.status(code).send({
+            error: true,
+            message: error.message,
+        });
+    }
 };
+
+// export const postLocalCache: Handler = async (req, res) => {
+//     const messageData = 'Just a POST response, data cointains the request body sent, nothing happened';
+//     const cacheData = false;
+//     console.log('req', req);
+//     // console.log('res', res);
+//     return res.status(200).send({
+//         error: false,
+//         cache: cacheData,
+//         message: messageData,
+//         data: req.body,
+//     });
+// };
 
 export const putLocalCache: Handler = async (req, res) => {
     const messageData = 'Just a PUT response, data cointains the request body sent, nothing happened';
@@ -130,8 +183,6 @@ export const deleteLocalCache: Handler = async (_, res) => {
     });
 };
 
-
-
 export const deleteCachedData: Handler = async (req, res) => {
     const query = req.query;
     const path = req.path;
@@ -146,7 +197,7 @@ export const deleteCachedData: Handler = async (req, res) => {
 
     let messageData = 'Cache cleared';
 
-    switch(type) {
+    switch (type) {
         case ClearType.FOLDER:
             if (existsSync(baseUrl) && existsSync(`${baseUrl}/${folderPath}`)) {
                 recursiveRemove(`${baseUrl}/${folderPath}`);
@@ -154,7 +205,7 @@ export const deleteCachedData: Handler = async (req, res) => {
             } else {
                 messageData = `${folderPath} not found`;
             }
-        break;
+            break;
         case ClearType.CONTENT:
             if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
                 unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
@@ -164,7 +215,7 @@ export const deleteCachedData: Handler = async (req, res) => {
             } else {
                 messageData = 'Nothing to clear';
             }
-        break;
+            break;
     }
 
     const cacheData = false;
