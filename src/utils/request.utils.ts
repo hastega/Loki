@@ -1,10 +1,11 @@
 import { Request } from 'express';
 import QueryString from 'qs';
-import { unlinkSync, rmdirSync, readdirSync } from 'fs';
+import { unlinkSync, rmdirSync, readdirSync, promises, writeFileSync } from 'fs';
 import { AxiosRequestConfig } from 'axios';
 import https from 'https';
 import config from 'config';
-
+import crypto from 'crypto';
+import { ResponseModel } from '../types/model/responseModel';
 export const splitPath = (path: string, shift: number): { folderPath: string; shifted: string[] } => {
     const shifted: string[] = [];
     const splittedPath = path.split('/');
@@ -68,4 +69,21 @@ export const getRequestConfig = (headers: { [key: string]: string }, queryParam:
     if (config.get<boolean>('localDatabase.rejectUnauthorized')) Object.assign(requestConfig, httpsAgent);
 
     return requestConfig;
+};
+
+export const getBodyHash = (body: any): string => {
+    return crypto.createHash('sha256').update(body).digest('base64url');
+};
+
+export const storeResponseFile = (finalFolder: string, filePath: string, payload: object) => {
+    promises.mkdir(finalFolder, { recursive: true }).then(() => {
+        const expTime: number = parseInt(process.env.EXPIRATION_TIME!);
+        writeFileSync(
+            filePath,
+            JSON.stringify({
+                payload, // The actual response
+                expiresIn: Date.now() + 1000 * expTime,
+            } as ResponseModel)
+        );
+    });
 };
