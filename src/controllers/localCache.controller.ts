@@ -4,19 +4,18 @@ import { Handler } from 'express';
 import { existsSync, promises, writeFileSync, unlinkSync } from 'fs';
 import config from 'config';
 import { manageHeader, manageQueryParams, splitPath, recursiveRemove } from '../utils/request.utils';
-import { ClearType } from '../properties/localCache.property';
+import { ClearType } from '../types/enums/ClearType.enum';
 
 export const getLocalCache: Handler = async (req, res) => {
-    let params = req.params;
+    const params = req.params;
     const query = req.query;
     let path = req.path;
     let noCache = false;
-    if (path.includes("nocache")) {
+    if (path.includes('nocache')) {
         noCache = true;
         path = path.substring(8);
         params[0] = params[0].substring(8);
     }
-    console.log(params[0], path, query)
 
     const headers: { [key: string]: string } = manageHeader(req);
 
@@ -39,7 +38,6 @@ export const getLocalCache: Handler = async (req, res) => {
     const fileName = manageQueryParams(query);
     const folderPath = splittedPath.folderPath;
 
-    console.log({ baseUrl });
     let responseData = null;
     let messageData: string;
     let cacheData: boolean;
@@ -55,13 +53,12 @@ export const getLocalCache: Handler = async (req, res) => {
         } else {
             const fetch = await axios.get(`https:/${params[0]}`, requestConfig);
 
-            promises
-                .mkdir(baseUrl + '/' + folderPath, { recursive: true })
-                .then((_) => {
-                    if (!noCache) {
-                        writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data))
-                    }
-                });
+            promises.mkdir(baseUrl + '/' + folderPath, { recursive: true })
+            .then((_) => {
+                if (!noCache) {
+                    writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data));
+                }
+            });
 
             responseData = fetch.data;
             messageData = "here/'s the fetched data";
@@ -75,10 +72,11 @@ export const getLocalCache: Handler = async (req, res) => {
             data: responseData,
         });
     } catch (error: any) {
-        const code = error instanceof AxiosError ? error.response?.status || 500 : 500;
+        const isAxiosError = error instanceof AxiosError;
+        const code = isAxiosError ? error.response?.status || 500 : 500;
         return res.status(code).send({
             error: true,
-            message: error.message,
+            message: isAxiosError ? error.message : error,
         });
     }
 };
@@ -129,8 +127,6 @@ export const deleteLocalCache: Handler = async (_, res) => {
         message: messageData,
     });
 };
-
-
 
 export const deleteCachedData: Handler = async (req, res) => {
     const query = req.query;
