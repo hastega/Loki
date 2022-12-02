@@ -5,8 +5,6 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 
 import swaggerUi from 'swagger-ui-express';
-import swaggerJSDoc from 'swagger-jsdoc';
-import { options } from './swaggerOptions';
 
 import usersRoutes from './routes/v1/users.routes';
 import authRoutes from './routes/v1/auth.routes';
@@ -20,6 +18,8 @@ import axios from 'axios';
 import https from 'https';
 import WebSocket from 'ws';
 import config from 'config';
+
+const swaggerDocument = require('./swagger-output.json');
 
 if (process.env.NODE_ENV === 'development') {
     const httpsAgent = new https.Agent({
@@ -51,14 +51,12 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
 
-const specs = swaggerJSDoc(options);
-
 app.use('/', usersRoutes);
 app.use('/', authRoutes);
 app.use('/lcache', localCacheRoutes);
 app.use('/proxy', proxyRoutes);
 app.use('/redis', redisRoutes);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/protected', checkUser, (_req, res) => {
     res.send('protected route');

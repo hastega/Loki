@@ -1,4 +1,7 @@
-export const options = {
+const swaggerAutogen = require('swagger-autogen');
+const swaggerJSDoc = require('swagger-jsdoc');
+
+const options = {
     definition: {
         info: {
             title: ' Hastega mock API',
@@ -13,3 +16,10 @@ export const options = {
     },
     apis: ['./src/routes/v1/localCache.routes.ts'],
 };
+
+const specs = swaggerJSDoc(options);
+
+const outputFile = './src/swagger-output.json';
+const endpointFiles = ['./src/app.ts'];
+
+swaggerAutogen(outputFile, endpointFiles, specs);
