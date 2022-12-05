@@ -5,7 +5,7 @@ import { AxiosRequestConfig } from 'axios';
 import https from 'https';
 import config from 'config';
 import crypto from 'crypto';
-import { ResponseModel } from '../types/model/cachedResponse.model';
+import { CachedResponseModel } from '../types/model/cachedResponse.model';
 
 export const splitPath = (path: string, shift: number): { folderPath: string; shifted: string[] } => {
     const shifted: string[] = [];
@@ -84,7 +84,7 @@ export const storeResponseFile = (finalFolder: string, filePath: string, payload
             JSON.stringify({
                 payload, // The actual response
                 expiresIn: Date.now() + 1000 * expTime,
-            } as ResponseModel)
+            } as CachedResponseModel)
         );
     });
 };

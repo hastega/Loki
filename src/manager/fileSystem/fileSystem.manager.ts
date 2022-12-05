@@ -16,17 +16,35 @@ export default class fileSystemManager {
         const splittedPath = this.splitPath(path, shiftNumber);
         const baseUrl = splittedPath.shifted[0];
         const folderPath = splittedPath.folderPath;
-
         let finalPath = '';
         if (this.baseUserPath !== '') finalPath = `${this.baseUserPath}/${baseUrl}/${folderPath}/${this.responseType}`;
         else finalPath = `${baseUrl}/${folderPath}/${this.responseType}`;
 
-        return finalPath;
+        return {
+            finalPath,
+            splittedPath,
+            noCache: splittedPath.noCache,
+        };
     }
 
-    public splitPath(path: string, shift: number): { folderPath: string; shifted: string[] } {
+    public sanitizeUrl(url: string) {
+        console.log(url);
+
+        const noCache = url.includes('nocache');
+        console.log(noCache);
+        if (!noCache) return url;
+
+        const urlSplit = url.split('/');
+        urlSplit.splice(urlSplit.indexOf('nocache'), 1);
+        return urlSplit.join('/');
+    }
+
+    public splitPath(path: string, shift: number): { folderPath: string; shifted: string[]; noCache: boolean } {
         const shifted: string[] = [];
         const splittedPath = path.split('/');
+
+        const noCache = splittedPath.includes('nocache');
+        if (noCache) splittedPath.splice(splittedPath.indexOf('nocache'), 1);
         splittedPath.shift(); // First shift is an empty string.
 
         for (let i = 0; i < shift; i++) {
@@ -35,6 +53,7 @@ export default class fileSystemManager {
         return {
             folderPath: splittedPath.join('/'),
             shifted: shifted,
+            noCache,
         };
     }
 
