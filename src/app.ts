@@ -19,19 +19,21 @@ import https from 'https';
 import WebSocket from 'ws';
 import config from 'config';
 
+// Manager
+import processEnvManager from './manager/processEnv/processEnv.manager';
+
+// To discuss
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require('./swagger-output.json');
 
-if (process.env.NODE_ENV === 'development') {
-    const httpsAgent = new https.Agent({
-        rejectUnauthorized: false,
-    });
-
-    axios.defaults.httpsAgent = httpsAgent;
-    console.log(process.env.NODE_ENV, `RejectUnauthorized is disabled.`);
+if (processEnvManager.isDevelopment()) {
+    axios.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+    console.log('development', `RejectUnauthorized is disabled.`);
 }
 
-const wss = new WebSocket.Server({ port: Number(process.env.WEB_SOCKET_PORT) || 8080 });
+const wss = new WebSocket.Server({ port: processEnvManager.getWebSocketPort() });
 
+// Reractor with a dedicated config manager?
 wss.on('connection', (ws) => {
     ws.on('message', (message) => {
         console.log('Recieved Meessage =>', message);
@@ -44,7 +46,7 @@ wss.on('connection', (ws) => {
 
 const app = express();
 
-app.set('port', process.env.LOCAL_DATABASE_PORT || 3000);
+app.set('port', processEnvManager.getLocalDatabasePort());
 
 app.use(cors());
 app.use(morgan('dev'));

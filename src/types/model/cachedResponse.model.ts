@@ -1,4 +1,4 @@
-export class ResponseModel {
+export class CachedResponseModel {
     expiresIn: number;
     payload: object;
 

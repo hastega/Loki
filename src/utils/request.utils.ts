@@ -5,7 +5,8 @@ import { AxiosRequestConfig } from 'axios';
 import https from 'https';
 import config from 'config';
 import crypto from 'crypto';
-import { ResponseModel } from '../types/model/responseModel';
+import { ResponseModel } from '../types/model/cachedResponse.model';
+
 export const splitPath = (path: string, shift: number): { folderPath: string; shifted: string[] } => {
     const shifted: string[] = [];
     const splittedPath = path.split('/');
@@ -45,7 +46,7 @@ export const recursiveRemove = (path: string, fileName?: string) => {
         const content = readdirSync(path, { withFileTypes: true });
         content.forEach((f) => {
             if (f.isDirectory()) {
-                recursiveRemove(path + '/' + f.name);
+                recursiveRemove(`${path}/${f.name}`);
             } else {
                 recursiveRemove(path, f.name);
             }
