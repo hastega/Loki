@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cb927a95-0c84-40ab-a8ad-db888a0adc80" name="Changes" comment="ESlint Fix on localCache&#10;Post call working. Need to find a proper way to cache multiple &lt;req.body, fetch.data&gt; maps inside a single post.XX.json file.">
+      <change afterPath="$PROJECT_DIR$/src/controllers/localCache.controller.backup.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/manager/fileSystem/fileSystem.manager.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/manager/processEnv/envEnum.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/manager/processEnv/processEnv.manager.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/types/model/bodyResponse.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example.env" beforeDir="false" afterPath="$PROJECT_DIR$/example.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/localCache.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/localCache.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/v1/localCache.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/v1/localCache.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/model/responseModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/model/cachedResponse.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/request.utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/request.utils.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="branchesCleanupHistory">
+      <BranchesCleanupHistory>
+        <option name="history">
+          <list>
+            <BranchCleanupEntry>
+              <option name="deletions">
+                <list>
+                  <BranchDeletion>
+                    <option name="hash" value="b1b3ac56e4c983701fc6a9a2d4c6b9b078d6030d" />
+                    <option name="name" value="develop" />
+                  </BranchDeletion>
+                </list>
+              </option>
+              <option name="timestamp" value="1669990216510" />
+            </BranchCleanupEntry>
+          </list>
+        </option>
+      </BranchesCleanupHistory>
+    </option>
+    <option name="projectConfigVersion" value="5" />
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="feature/TCIN-60" />
+                    <option name="lastUsedInstant" value="1669372051" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="develop" />
+                    <option name="lastUsedInstant" value="1669372023" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1669372022" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="ProjectId" id="2I2Fr1aExKEvdJrYJW3EhloXAuL" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="compactDirectories" value="true" />
+    <option name="flattenModules" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showVisibilityIcons" value="true" />
+    <option name="sortByType" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/hastega/IdeaProjects/TI/Loki/src/controllers",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettier.import.notification.dismissed": "true",
+    "prettierjs.PrettierConfiguration.Package": "/home/hastega/IdeaProjects/TI/Loki/node_modules/prettier",
+    "settings.editor.selected.configurable": "zielu.gittoolbox.app.config.v2",
+    "ts.external.directory.path": "/home/hastega/IdeaProjects/TI/Loki/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/controllers" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="SwaggerCodegen">
+      <option name="activeConfigurationType" value="FILE" />
+      <option name="configurationPath" value="" />
+      <option name="customJreEnabled" value="false" />
+      <option name="customTemplatesPath" value="" />
+      <option name="enableDebugLogging" value="false" />
+      <option name="generateToPath" value="$PROJECT_DIR$/gen" />
+      <option name="generationParameters">
+        <list />
+      </option>
+      <option name="generatorPath" value="https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/5.0.0/openapi-generator-cli-5.0.0.jar" />
+      <option name="jdkPath" value="" />
+      <option name="language" value="java" />
+      <option name="specificationPath" value="$PROJECT_DIR$/src/swagger-output.json" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb927a95-0c84-40ab-a8ad-db888a0adc80" name="Changes" comment="" />
+      <created>1669371968120</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1669371968120</updated>
+      <workItem from="1669371971051" duration="7743000" />
+      <workItem from="1669394195378" duration="48000" />
+      <workItem from="1669394255719" duration="605000" />
+      <workItem from="1669394884203" duration="1008000" />
+      <workItem from="1669732648680" duration="3234000" />
+      <workItem from="1669801198809" duration="264000" />
+      <workItem from="1669823535668" duration="4317000" />
+      <workItem from="1669832047611" duration="1787000" />
+      <workItem from="1669836071422" duration="46000" />
+      <workItem from="1669836135655" duration="33000" />
+      <workItem from="1669882839941" duration="4295000" />
+      <workItem from="1669904485895" duration="9263000" />
+      <workItem from="1669969365164" duration="460000" />
+      <workItem from="1669974783512" duration="334000" />
+      <workItem from="1669975310718" duration="177000" />
+      <workItem from="1669987644281" duration="3274000" />
+      <workItem from="1669992135593" duration="7340000" />
+    </task>
+    <task id="LOCAL-00001" summary="ESlint Fix on localCache&#10;Post call working. Need to find a proper way to cache multiple &lt;req.body, fetch.data&gt; maps inside a single post.XX.json file.">
+      <created>1669828152345</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1669828152345</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ID_WIDTH">
+                <map>
+                  <entry key="Table.Default.Author.ColumnIdWidth" value="97" />
+                  <entry key="Table.Default.Date.ColumnIdWidth" value="106" />
+                  <entry key="Table.Space.CommitStatus.ColumnIdWidth" value="66" />
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="ESlint Fix on localCache&#10;Post call working. Need to find a proper way to cache multiple &lt;req.body, fetch.data&gt; maps inside a single post.XX.json file." />
+    <option name="LAST_COMMIT_MESSAGE" value="ESlint Fix on localCache&#10;Post call working. Need to find a proper way to cache multiple &lt;req.body, fetch.data&gt; maps inside a single post.XX.json file." />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

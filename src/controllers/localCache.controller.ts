@@ -23,6 +23,7 @@ export const getLocalCache: Handler = async (req, res) => {
         path = path.substring(8);
         params[0] = params[0].substring(8);
     }
+    console.log(params[0], path, query);
 
     const headers: { [key: string]: string } = manageHeader(req);
 
