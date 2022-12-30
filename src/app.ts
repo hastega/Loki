@@ -21,6 +21,7 @@ import config from 'config';
 
 // Manager
 import processEnvManager from './manager/processEnv/processEnv.manager';
+import { logger } from './utils/logger';
 
 // To discuss
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -28,7 +29,7 @@ const swaggerDocument = require('./swagger-output.json');
 
 if (processEnvManager.isDevelopment()) {
     axios.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
-    console.log('development', `RejectUnauthorized is disabled.`);
+    logger.info('Development: RejectUnauthorized is disabled.');
 }
 
 const wss = new WebSocket.Server({ port: processEnvManager.getWebSocketPort() });

@@ -20,7 +20,10 @@ export default class processEnvManager {
     }
 
     public static getBaseDirectory(): string {
-        const baseDir = process.env.LOCAL_DATABASE_DIR || '';
-        return baseDir;
+        return process.env.LOCAL_DATABASE_DIR || '';
+    }
+
+    public static getHowManyLogsToKeep(): number {
+        return process.env.LOGS_TO_KEEP ? +process.env.LOGS_TO_KEEP : 7;
     }
 }
