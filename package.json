@@ -1,6 +1,6 @@
 {
   "name": "loki",
-  "version": "1.0.0",
+  "version": "1.0.01",
   "description": "An utility Node server to support frontends development",
   "main": "server.js",
   "scripts": {
