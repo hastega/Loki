@@ -1,173 +1,121 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import https from 'https';
+import fileSystemManager from './../manager/fileSystem/fileSystem.manager';
+import { getBodyHash, getRequestConfig, manageHeader, manageQueryParams } from '../utils/request.utils';
+import axios, { AxiosRequestConfig } from 'axios';
 import { Handler } from 'express';
-import { existsSync, promises, writeFileSync, unlinkSync } from 'fs';
-import config from 'config';
-import { manageHeader, manageQueryParams, splitPath, recursiveRemove } from '../utils/request.utils';
-import { ClearType } from '../types/enums/ClearType.enum';
+import { BodyResponseModel } from '../types/model/bodyResponse.model';
+import { existsSync, promises, writeFileSync } from 'fs';
 
 export const getLocalCache: Handler = async (req, res) => {
-    const params = req.params;
-    const query = req.query;
-    let path = req.path;
-    let noCache = false;
-    if (path.includes('nocache')) {
-        noCache = true;
-        path = path.substring(8);
-        params[0] = params[0].substring(8);
-    }
-
-    const headers: { [key: string]: string } = manageHeader(req);
-
-    const requestConfig: AxiosRequestConfig = {
-        headers: headers,
-        params: query,
-    };
-
-    const httpsAgent = {
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false,
-        }),
-    };
-
-    config.get<boolean>('localDatabase.rejectUnauthorized') ? Object.assign(requestConfig, httpsAgent) : null;
-
-    const splittedPath = splitPath(path, 1);
-    const baseUrl = splittedPath.shifted[0];
-
-    const fileName = manageQueryParams(query);
-    const folderPath = splittedPath.folderPath;
-
-    let responseData = null;
-    let messageData: string;
-    let cacheData: boolean;
-
+    const fsManager = new fileSystemManager('Get');
     try {
-        if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
-            await promises.readFile(baseUrl + '/' + folderPath + '/' + fileName + '.json').then((res) => {
-                responseData = JSON.parse(res.toString());
-            });
-
-            messageData = "here/'s you cached data";
-            cacheData = true;
-        } else {
-            const fetch = await axios.get(`https:/${params[0]}`, requestConfig);
-
-            promises.mkdir(baseUrl + '/' + folderPath, { recursive: true })
-            .then((_) => {
-                if (!noCache) {
-                    writeFileSync(baseUrl + '/' + folderPath + '/' + fileName + '.json', JSON.stringify(fetch.data));
-                }
-            });
-
-            responseData = fetch.data;
-            messageData = "here/'s the fetched data";
-            cacheData = false;
-        }
-
-        return res.status(200).send({
-            error: false,
-            cache: cacheData,
-            message: messageData,
-            data: responseData,
-        });
-    } catch (error: any) {
-        const isAxiosError = error instanceof AxiosError;
-        const code = isAxiosError ? error.response?.status || 500 : 500;
-        return res.status(code).send({
-            error: true,
-            message: isAxiosError ? error.message : error,
-        });
+        const body = await baseRequestHandler(req, 'get', fsManager, false);
+        console.log(body);
+        return res.status(200).send(body);
+    } catch (e) {
+        return res.status(500).send({ error: e });
     }
 };
 
 export const postLocalCache: Handler = async (req, res) => {
-    const messageData = 'Just a POST response, data cointains the request body sent, nothing happened';
-    const cacheData = false;
-
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-        data: req.body,
-    });
+    const fsManager = new fileSystemManager('Post');
+    try {
+        const body = await baseRequestHandler(req, 'post', fsManager);
+        return res.status(200).send(body);
+    } catch (e) {
+        return res.status(500).send({ error: e });
+    }
 };
 
 export const putLocalCache: Handler = async (req, res) => {
-    const messageData = 'Just a PUT response, data cointains the request body sent, nothing happened';
-    const cacheData = false;
-
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-        data: req.body,
-    });
+    const fsManager = new fileSystemManager('Put');
+    try {
+        const body = await baseRequestHandler(req, 'put', fsManager);
+        return res.status(200).send(body);
+    } catch (e) {
+        return res.status(500).send({ error: e });
+    }
 };
 
 export const patchLocalCache: Handler = async (req, res) => {
-    const messageData = 'Just a PATCH response, data cointains the request body sent, nothing happened';
-    const cacheData = false;
-
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-        data: req.body,
-    });
+    const fsManager = new fileSystemManager('Patch');
+    try {
+        const body = await baseRequestHandler(req, 'patch', fsManager);
+        return res.status(200).send(body);
+    } catch (e) {
+        return res.status(500).send({ error: e });
+    }
 };
 
-export const deleteLocalCache: Handler = async (_, res) => {
-    const messageData = 'Just a DELETE response, nothing happened';
-    const cacheData = false;
-
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-    });
-};
-
-export const deleteCachedData: Handler = async (req, res) => {
+/*
+ axiosCall: (
+        url: string,
+        data?: any,
+        config?: AxiosRequestConfig<any> | undefined
+    ) => Promise<AxiosResponse<any, any>>,
+ */
+const baseRequestHandler = async (req: any, axiosCall: string, fsManager: fileSystemManager, hashBody = true) => {
+    const params = req.params;
     const query = req.query;
-    const path = req.path;
 
-    const splittedPath = splitPath(path, 3);
+    const headers: { [key: string]: string } = manageHeader(req);
+    const requestConfig = getRequestConfig(headers, query);
 
-    const type = splittedPath.shifted[1];
-    const baseUrl = splittedPath.shifted[2];
+    const sanitizedPath = fsManager.sanitizePath(req.path, 1);
+    const noCache = sanitizedPath.noCache;
+    const directoryPath = sanitizedPath.finalPath;
 
     const fileName = manageQueryParams(query);
-    const folderPath = splittedPath.folderPath;
+    let currentFile = '';
 
-    let messageData = 'Cache cleared';
-
-    switch(type) {
-        case ClearType.FOLDER:
-            if (existsSync(baseUrl) && existsSync(`${baseUrl}/${folderPath}`)) {
-                recursiveRemove(`${baseUrl}/${folderPath}`);
-                messageData = `Force deleted ${folderPath}`;
-            } else {
-                messageData = `${folderPath} not found`;
-            }
-        break;
-        case ClearType.CONTENT:
-            if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath + '/' + fileName + '.json')) {
-                unlinkSync(baseUrl + '/' + folderPath + '/' + fileName + '.json');
-                messageData = 'File removed';
-            } else if (existsSync(baseUrl) && existsSync(baseUrl + '/' + folderPath)) {
-                messageData = 'File not found';
-            } else {
-                messageData = 'Nothing to clear';
-            }
-        break;
+    if (hashBody) {
+        const bodyHash = await getBodyHash(JSON.stringify(req.body));
+        currentFile = directoryPath + '/' + fileName + '_' + bodyHash + '.json';
+    } else {
+        currentFile = directoryPath + '/' + fileName + '.json';
     }
 
-    const cacheData = false;
+    const successResponseBody = new BodyResponseModel();
 
-    return res.status(200).send({
-        error: false,
-        cache: cacheData,
-        message: messageData,
-    });
+    if (!noCache && existsSync(directoryPath) && existsSync(currentFile)) {
+        console.log(currentFile);
+        await promises.readFile(currentFile).then((res) => {
+            successResponseBody.data = JSON.parse(res.toString());
+        });
+        successResponseBody.filenameCached = currentFile;
+        successResponseBody.message = "here's you cached data";
+        successResponseBody.cache = true;
+    } else {
+        const fetch = await getServerResponse(
+            axiosCall,
+            fsManager.sanitizeUrl(`https:/${params[0]}`),
+            req.body,
+            requestConfig
+        );
+        promises.mkdir(directoryPath, { recursive: true }).then((_) => {
+            if (!noCache) writeFileSync(currentFile, JSON.stringify(fetch.data));
+        });
+        successResponseBody.data = fetch.data;
+        successResponseBody.message = "here's the fetched data";
+        successResponseBody.cache = false;
+        successResponseBody.filenameCached = currentFile;
+    }
+    console.log(successResponseBody);
+    return successResponseBody;
+};
+
+const getServerResponse = (type: string, url: string, body: string, requestConfig: AxiosRequestConfig) => {
+    switch (type.toUpperCase()) {
+        case 'GET':
+            return axios.get(url, requestConfig);
+        case 'POST':
+            return axios.post(url, body, requestConfig);
+        case 'PATCH':
+            return axios.patch(url, body, requestConfig);
+        case 'PUT':
+            return axios.put(url, body, requestConfig);
+        case 'DELETE':
+            return axios.delete(url, requestConfig);
+        default:
+            throw new Error(`Invalid requesy: ${type}`);
+    }
 };
