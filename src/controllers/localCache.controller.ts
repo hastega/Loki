@@ -1,18 +1,32 @@
 import fileSystemManager from './../manager/fileSystem/fileSystem.manager';
 import { getBodyHash, getRequestConfig, manageHeader, manageQueryParams } from '../utils/request.utils';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { Handler } from 'express';
 import { BodyResponseModel } from '../types/model/bodyResponse.model';
 import { existsSync, promises, writeFileSync } from 'fs';
+import { logger } from '../utils/logger';
 
 export const getLocalCache: Handler = async (req, res) => {
     const fsManager = new fileSystemManager('Get');
     try {
         const body = await baseRequestHandler(req, 'get', fsManager, false);
-        console.log(body);
         return res.status(200).send(body);
     } catch (e) {
-        return res.status(500).send({ error: e });
+        let err = {};
+        // Tutto è un error. Need the if guard to shout up the linter because 'e' is any|unknown at the beginning
+        if (e instanceof Error) {
+            err = {
+                msg: e.message,
+                type: e.constructor.name,
+            };
+        }
+        if (e instanceof AxiosError) {
+            Object.assign(err, {
+                axiosMethod: e.config.method,
+                params: e.config.params,
+            });
+        }
+        return res.status(500).send(err);
     }
 };
 
@@ -46,13 +60,6 @@ export const patchLocalCache: Handler = async (req, res) => {
     }
 };
 
-/*
- axiosCall: (
-        url: string,
-        data?: any,
-        config?: AxiosRequestConfig<any> | undefined
-    ) => Promise<AxiosResponse<any, any>>,
- */
 const baseRequestHandler = async (req: any, axiosCall: string, fsManager: fileSystemManager, hashBody = true) => {
     const params = req.params;
     const query = req.query;
@@ -66,7 +73,6 @@ const baseRequestHandler = async (req: any, axiosCall: string, fsManager: fileSy
 
     const fileName = manageQueryParams(query);
     let currentFile = '';
-
     if (hashBody) {
         const bodyHash = await getBodyHash(JSON.stringify(req.body));
         currentFile = directoryPath + '/' + fileName + '_' + bodyHash + '.json';
@@ -77,7 +83,6 @@ const baseRequestHandler = async (req: any, axiosCall: string, fsManager: fileSy
     const successResponseBody = new BodyResponseModel();
 
     if (!noCache && existsSync(directoryPath) && existsSync(currentFile)) {
-        console.log(currentFile);
         await promises.readFile(currentFile).then((res) => {
             successResponseBody.data = JSON.parse(res.toString());
         });
@@ -99,10 +104,17 @@ const baseRequestHandler = async (req: any, axiosCall: string, fsManager: fileSy
         successResponseBody.cache = false;
         successResponseBody.filenameCached = currentFile;
     }
-    console.log(successResponseBody);
     return successResponseBody;
 };
 
+/**
+ * @description Pass the generalized request to the correct endpoint with Axios.
+ * @param type
+ * @param url
+ * @param body
+ * @param requestConfig
+ * @throws Error on axios error
+ */
 const getServerResponse = (type: string, url: string, body: string, requestConfig: AxiosRequestConfig) => {
     switch (type.toUpperCase()) {
         case 'GET':
@@ -116,6 +128,18 @@ const getServerResponse = (type: string, url: string, body: string, requestConfi
         case 'DELETE':
             return axios.delete(url, requestConfig);
         default:
-            throw new Error(`Invalid requesy: ${type}`);
+            throw new InvalidProtocol(`Invalid request: ${type}`);
     }
 };
+
+class InvalidProtocol extends Error {
+    constructor(message: string) {
+        super(message);
+
+        // assign the error class name in your custom error (as a shortcut)
+        this.name = this.constructor.name;
+
+        // capturing the stack trace keeps the reference to your error class
+        Error.captureStackTrace(this, this.constructor);
+    }
+}

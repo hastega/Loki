@@ -28,10 +28,7 @@ export default class fileSystemManager {
     }
 
     public sanitizeUrl(url: string) {
-        console.log(url);
-
         const noCache = url.includes('nocache');
-        console.log(noCache);
         if (!noCache) return url;
 
         const urlSplit = url.split('/');
