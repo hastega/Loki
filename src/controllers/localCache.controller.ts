@@ -12,20 +12,7 @@ export const getLocalCache: Handler = async (req, res) => {
         const body = await baseRequestHandler(req, 'get', fsManager, false);
         return res.status(200).send(body);
     } catch (e) {
-        let err = {};
-        // Tutto è un error. Need the if guard to shout up the linter because 'e' is any|unknown at the beginning
-        if (e instanceof Error) {
-            err = {
-                msg: e.message,
-                type: e.constructor.name,
-            };
-        }
-        if (e instanceof AxiosError) {
-            Object.assign(err, {
-                axiosMethod: e.config.method,
-                params: e.config.params,
-            });
-        }
+        const err = getError(e);
         return res.status(500).send(err);
     }
 };
@@ -36,7 +23,8 @@ export const postLocalCache: Handler = async (req, res) => {
         const body = await baseRequestHandler(req, 'post', fsManager);
         return res.status(200).send(body);
     } catch (e) {
-        return res.status(500).send({ error: e });
+        const err = getError(e);
+        return res.status(500).send(err);
     }
 };
 
@@ -46,7 +34,8 @@ export const putLocalCache: Handler = async (req, res) => {
         const body = await baseRequestHandler(req, 'put', fsManager);
         return res.status(200).send(body);
     } catch (e) {
-        return res.status(500).send({ error: e });
+        const err = getError(e);
+        return res.status(500).send(err);
     }
 };
 
@@ -56,7 +45,8 @@ export const patchLocalCache: Handler = async (req, res) => {
         const body = await baseRequestHandler(req, 'patch', fsManager);
         return res.status(200).send(body);
     } catch (e) {
-        return res.status(500).send({ error: e });
+        const err = getError(e);
+        return res.status(500).send(err);
     }
 };
 
@@ -130,6 +120,23 @@ const getServerResponse = (type: string, url: string, body: string, requestConfi
         default:
             throw new InvalidProtocol(`Invalid request: ${type}`);
     }
+};
+
+const getError = (e: unknown): object => {
+    const err = {};
+    if (e instanceof Error) {
+        Object.assign(err, {
+            msg: e.message,
+            type: e.constructor.name,
+        });
+    }
+    if (e instanceof AxiosError) {
+        Object.assign(err, {
+            axiosMethod: e.config.method,
+            params: e.config.params,
+        });
+    }
+    return err;
 };
 
 class InvalidProtocol extends Error {
