@@ -23,7 +23,7 @@ import config from 'config';
 import processEnvManager from './manager/processEnv/processEnv.manager';
 import { logger } from './utils/logger';
 
-// To discuss
+// TODO To discuss
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require('./swagger-output.json');
 
@@ -37,7 +37,7 @@ const wss = new WebSocket.Server({ port: processEnvManager.getWebSocketPort() })
 // Reractor with a dedicated config manager?
 wss.on('connection', (ws) => {
     ws.on('message', (message) => {
-        console.log('Recieved Meessage =>', message);
+        logger.info('Received Message', message);
     });
 
     if (!config.get<boolean>('websocket.setInterval')) return ws.send(config.get<string>('websocket.responseMessage'));
