@@ -19,14 +19,12 @@ export const getUsers: Handler = (req, res) => {
 export const createUser: Handler = async (req, res) => {
     const { name, password } = req.body;
     const userFound = findUserByName(req.params.name);
-
     if (userFound) {
         return res.status(500).send('user already exist');
     }
 
     const newUser = { id: nanoid(), name, password: await hashPassword(password) };
     const token = await createToken(newUser.id);
-
     try {
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge });
         getConnection().get('users').push(newUser).write();

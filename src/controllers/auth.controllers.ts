@@ -12,6 +12,7 @@ export const login: Handler = async (req, res) => {
 
         if (await deHashPassword(password, userFound.password)) {
             res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+            userFound['access_token'] = token;
             return res.status(201).json(userFound);
         }
         res.status(400).send('incorrected password');

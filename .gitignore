@@ -133,3 +133,5 @@ dist
 .DS_Store
 .idea/
 Db/
+
+DbCache/

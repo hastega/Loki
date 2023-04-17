@@ -5,6 +5,7 @@ export type User = {
     id: string;
     name: string;
     password: string;
+    access_token?: string;
 };
 
 type Schema = {
