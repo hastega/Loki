@@ -1,12 +1,12 @@
 import { Handler } from 'express';
 import * as redis from 'redis';
-import config from 'config';
+const config = require('config');
 import axios, { AxiosRequestConfig } from 'axios';
 
 const redisClient = redis.createClient({
     socket: {
-        port: config.get<number>('redis.port'),
-        host: config.get<string>('redis.hostname'),
+        port: config.get('redis.port'),
+        host: config.get('redis.hostname'),
     },
 });
 

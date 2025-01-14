@@ -9,7 +9,12 @@
         "interval": 5000
     },
     "localDatabase": {
+        "folder": ".db",
         "rejectUnauthorized": false,
         "customHeaders": []
+    },
+    "logs": {
+        "daysToKeep": 7,
+        "folder": ".logs"
     }
 }

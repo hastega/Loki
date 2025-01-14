@@ -1,4 +1,5 @@
 import { nodeEnv } from './envEnum';
+const config = require('config');
 
 export default class processEnvManager {
     public static isDevelopment(): boolean {
@@ -11,7 +12,7 @@ export default class processEnvManager {
         return process.env.WEB_SOCKET_PORT ? +process.env.WEB_SOCKET_PORT : 8080;
     }
     public static getLocalDatabasePort(): number {
-        return process.env.LOCAL_DATABASE_PORT ? +process.env.LOCAL_DATABASE_PORT : 3000;
+        return process.env.LOCAL_DATABASE_PORT ? +process.env.LOCAL_DATABASE_PORT : 4201;
     }
 
     public static getRequestExpirationDate(): number {
@@ -20,10 +21,6 @@ export default class processEnvManager {
     }
 
     public static getBaseDirectory(): string {
-        return process.env.LOCAL_DATABASE_DIR || '';
-    }
-
-    public static getHowManyLogsToKeep(): number {
-        return process.env.LOGS_TO_KEEP ? +process.env.LOGS_TO_KEEP : 7;
+        return process.env.LOCAL_DATABASE_DIR || config.get('localDatabase.folder');
     }
 }

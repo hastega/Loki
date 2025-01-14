@@ -27,17 +27,12 @@
   <p align="center">
     An utility Node server to support frontends development
     <br />
-    <!-- <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
     ·
-    <a href="https://ithub.com/hastega/Loki/issues">Report Bug</a>
+    <a href="https://github.com/hastega/Loki/issues">Report Bug</a>
     ·
-    <a href="https://ithub.com/hastega/Loki/issues">Request Feature</a> -->
+    <a href="https://github.com/hastega/Loki/issues">Request Feature</a>
   </p>
 </div>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -95,6 +90,7 @@ We've built it with various utilities that we've used, and still use on a daily 
 
 - Clone the repo and install requirments.
 
+- > `nvm use`
 - > `npm install`
 - > create `.env` file following the `example.env` file
 
@@ -112,7 +108,6 @@ Remember that you need to have Redis installed on your machine if you want to us
 <!-- USAGE EXAMPLES -->
 ## FEATURE USAGE
 
----
 - ## WEB SOCKET
 
 The main purpose of this feature is to create a simple Web Socket connection, after configuring 
@@ -211,7 +206,6 @@ all the dbDirectory structure will be created automatically and also the `.json`
 
 and those files will be use in respose on relative endpoint request. 
 
-
 - Usage with https and custom headers
 
 Loki is able to interrogate also custom headers needed endpoints. To correctly pass, without any problems, all the custom headers can be used the middleware `setHeader()` inside the desired route.
@@ -231,6 +225,14 @@ To semplify the usage you could use also the `config/default.json`
 ```
 As you can see there is also another config key `rejectUnauthorized` that can be set to `true` to use axios with https request if is needed
 
+Another usage of the Local Database feature is the `nocache` mode, which was recently added. This mode allows us to use the endpoint with an additional parameter `/nocache`. This parameter ensures that during certain stages of development, our website will be reachable and usable with updated data from the database.
+
+Let's consider a scenario where, at the starting point of our server application, no endpoint is interrogable. Initially, we need to manually build the folder tree as described in the first paragraph. After some time, once our first endpoint becomes operational, we can delete our local database files.
+
+If we interrogate the endpoint again, the folder tree and JSON file will be automatically created, allowing us to start working on it immediately.
+
+Now, suppose we have significantly edited the data locally. By adding the `nocache` parameter to our URL, all folders and files in the local database will be updated with fresh data fetched directly from the server. This ensures that the latest server data is always available when needed.
+
 
 - ## JSON SERVER
 
@@ -243,16 +245,13 @@ As you can see there is also another config key `rejectUnauthorized` that can be
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- ROADMAP -->
 ## Roadmap
 
 - [x] Made a V1.0.0
 - [ ] Continue writing docs
 - [ ] Create classes to change response type
-- [ ] Enanche handling of errors
-- [ ] Add additional feature for PUT, POST, PATCH, DELETE methods 
+- [x] Enanche handling of errors
+- [x] Add additional feature for PUT, POST, PATCH, DELETE methods 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

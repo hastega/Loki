@@ -132,6 +132,6 @@ dist
 
 .DS_Store
 .idea/
-Db/
 
-DbCache/
+# common db folder for local cache
+.db/
