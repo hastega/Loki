@@ -3,7 +3,7 @@ import QueryString from 'qs';
 import { unlinkSync, rmdirSync, readdirSync, promises, writeFileSync } from 'fs';
 import { AxiosRequestConfig } from 'axios';
 import https from 'https';
-import config from 'config';
+const config = require('config');
 import crypto from 'crypto';
 import { CachedResponseModel } from '../types/model/cachedResponse.model';
 
@@ -67,7 +67,7 @@ export const getRequestConfig = (headers: { [key: string]: string }, queryParam:
         }),
     };
 
-    if (config.get<boolean>('localDatabase.rejectUnauthorized')) Object.assign(requestConfig, httpsAgent);
+    if (config.get('localDatabase.rejectUnauthorized')) Object.assign(requestConfig, httpsAgent);
 
     return requestConfig;
 };

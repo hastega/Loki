@@ -4,11 +4,11 @@ import CustomParseFormat from 'dayjs/plugin/customParseFormat';
 import fs, { unlinkSync } from 'fs';
 import processEnvManager from '../manager/processEnv/processEnv.manager';
 import path from 'path';
+const config = require('config');
 
-export const LOG_DIR = 'logs/';
 dayjs.extend(CustomParseFormat);
 const currendDay = dayjs().format('YYYY_MM_DD');
-const logFile = currendDay + '.log';
+const logFileName = currendDay + '.log';
 
 /**
  * Scegliere quale formato vogliamo.
@@ -21,14 +21,14 @@ export const logger = createLogger({
             level: processEnvManager.isDevelopment() ? 'info' : 'error',
         }),
         new transports.File({
-            filename: LOG_DIR + logFile,
+            filename: config.get('logs.folder') + logFileName,
         }),
     ],
 });
 
 export function clearLogs(logger: Logger) {
-    const firstDayToClear = dayjs().add(-processEnvManager.getHowManyLogsToKeep(), 'day');
-    const directoryPath = path.basename(LOG_DIR);
+    const firstDayToClear = dayjs().subtract(config.get('logs.daysToKeep'), 'day');
+    const directoryPath = path.basename(config.get('logs.folder'));
     fs.readdir(directoryPath, function (err, files) {
         if (err) return;
         files.forEach(function (file) {

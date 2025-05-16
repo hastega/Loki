@@ -69,6 +69,7 @@ const baseRequestHandler = async (req: any, axiosCall: string, fsManager: fileSy
     } else {
         currentFile = directoryPath + '/' + fileName + '.json';
     }
+    console.log("CURRENT FILE "+ currentFile);
 
     const successResponseBody = new BodyResponseModel();
 

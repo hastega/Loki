@@ -8,7 +8,7 @@ import {
     putLocalCache,
 } from '../../controllers/localCache.controller';
 import { setHeader } from '../../controllers/redis.controllers';
-import config from 'config';
+const config = require('config');
 
 const router = Router();
 
@@ -16,7 +16,7 @@ const router = Router();
 //
 // router.get('/clearcache/content/*', deleteCachedData);
 
-router.get('*', setHeader([...config.get<string[]>('localDatabase.customHeaders')]), getLocalCache);
+router.get('*', setHeader([...config.get('localDatabase.customHeaders')]), getLocalCache);
 
 router.post('*', postLocalCache);
 

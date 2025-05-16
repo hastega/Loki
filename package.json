@@ -6,11 +6,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/server.ts",
+    "debug": "npx nodemon src/server.ts",
     "start": "node build/server.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "swagger-autogen": "node ./swagger.ts"
+  },
+  "nodemonConfig": {
+    "ext": "js",
+    "ignore": [
+      "*.test.ts",
+      ".db/*",
+      "logs/*"
+    ],
+    "delay": "2"
   },
   "author": "Paolo Micheletti @Hastega",
   "license": "ISC",
@@ -64,6 +74,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
+    "nodemon": "^3.1.9",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8",
     "tslint": "^6.1.3",
