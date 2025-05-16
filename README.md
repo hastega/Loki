@@ -92,7 +92,8 @@ We've built it with various utilities that we've used, and still use on a daily 
 
 - > `nvm use`
 - > `npm install`
-- > create `.env` file following the `example.env` file
+
+> **Note:** While we previously required creating a `.env` file from `example.env`, this is no longer necessary as environment variables are now managed through the `processEnv.manager.ts` module. The application will use default values if environment variables are not provided.
 
 For Dev environment 
 
@@ -236,11 +237,93 @@ Now, suppose we have significantly edited the data locally. By adding the `nocac
 
 - ## JSON SERVER
 
-<em>writing docs for JSON server usage...</em>
+JSON Server is a feature that allows you to create a simple REST API based on a JSON file. In Loki, this feature uses the `db.json` file in the project root.
+
+### Configuration
+The `db.json` file must contain a JSON object with the entities you want to expose as endpoints. For example:
+
+```json
+{
+  "users": [
+    { "id": 1, "name": "John Doe", "email": "john@example.com" },
+    { "id": 2, "name": "Jane Smith", "email": "jane@example.com" }
+  ],
+  "projects": [
+    { "id": 1, "title": "Project A", "userId": 1 },
+    { "id": 2, "title": "Project B", "userId": 2 }
+  ]
+}
+```
+
+### Usage
+Once the `db.json` file is configured, you can use the following endpoints:
+
+- `GET /users` - Gets the list of all users
+- `GET /users/1` - Gets the user with id 1
+- `POST /users` - Creates a new user
+- `PUT /users/1` - Fully updates the user with id 1
+- `PATCH /users/1` - Partially updates the user with id 1
+- `DELETE /users/1` - Deletes the user with id 1
+
+The same patterns apply to all entities defined in the `db.json` file.
+
+### Filters and Queries
+You can use various query parameters to filter the results:
+
+- `GET /users?name=John` - Filters users by name
+- `GET /projects?userId=1` - Filters projects by userId
+- `GET /users?_sort=name&_order=desc` - Sorts users by name in descending order
+- `GET /users?_page=1&_limit=10` - Pagination: page 1 with 10 items per page
+
+### Multi-Database Configuration
+
+An important feature of Loki is the ability to manage multiple database configurations for different domains. This is particularly useful when working with microservices or distributed APIs.
+
+For example, if you need to simulate two different APIs such as:
+- `athena.it/api/v1/users`
+- `efesto.it/api/v2/projects`
+
+Loki can handle both through JSON Server endpoints, automatically creating separate JSON files for each domain when it can't reach the remote server.
+
+When Loki receives a request for an unavailable endpoint, it will create a JSON file in the configured directory (default `.db`) with the appropriate structure, allowing you to simulate responses for different domains simultaneously.
+
+Each domain will have its own independent file and directory structure, allowing you to keep the different simulated APIs separate.
 
 - ## REDIS SERVER
 
-<em>writing docs for REDIS server usage...</em>
+The Redis functionality in Loki allows you to use Redis as a cache for API responses. This is particularly useful when you need to make frequent calls to external endpoints that don't change their data often.
+
+### Prerequisites
+- Redis must be installed and running on your system
+- Redis configuration must be specified in the `config/default.json` file:
+
+```json
+"redis": {
+    "hostname": "localhost",
+    "port": 6379
+}
+```
+
+### Usage
+The Redis endpoint allows you to cache API responses:
+
+> `localhost:4201/redis/example.com/api/v1/endpoint`
+
+When a request is made to this endpoint:
+1. Loki will check if there is a valid cache for this request in Redis
+2. If it exists, it will return the data from the cache
+3. If it doesn't exist, it will make the request to the actual endpoint, store the response in Redis, and return it
+
+### Advanced Configuration
+You can configure custom headers for Redis requests using the `setHeader()` middleware:
+
+```js
+router.get("*", setHeader(["CUSTOM_AUTH_HEADER"]), getRedisCache);
+```
+
+This is useful when the external endpoint requires authentication or other custom headers.
+
+Cached responses are automatically invalidated after a certain period of time (configurable through Redis).
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -250,8 +333,10 @@ Now, suppose we have significantly edited the data locally. By adding the `nocac
 - [x] Made a V1.0.0
 - [ ] Continue writing docs
 - [ ] Create classes to change response type
-- [x] Enanche handling of errors
-- [x] Add additional feature for PUT, POST, PATCH, DELETE methods 
+- [x] Enhance handling of errors
+- [x] Add additional feature for PUT, POST, PATCH, DELETE methods
+- [ ] Improve Redis integration with persistent storage options
+- [ ] Add WebSocket advanced features (rooms, events) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -316,4 +401,4 @@ Paolo Micheletti - [MAINTAINER](https://www.linkedin.com/in/pablo1255/) - p.mich
 [Typescript.org]: https://img.shields.io/badge/-Typescript-3178C6?logo=typescript&logoColor=white&style=for-the-badge
 [Typescript-url]: https://www.typescriptlang.org/
 [Redis]: https://img.shields.io/badge/-Redis-DC382D?logo=redis&logoColor=white&style=for-the-badge
-[Redis-url]: https://redis.io/
+[Redis-url]: https://redis.io/ 
